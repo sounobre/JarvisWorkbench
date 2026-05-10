@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: jarvis-workbench-api
+server:
+  port: 8088
