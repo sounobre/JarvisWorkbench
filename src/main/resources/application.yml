@@ -1,5 +1,7 @@
 spring:
   application:
     name: jarvis-workbench-api
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
 server:
   port: 8088
