@@ -1,34 +1,69 @@
-# Backlog de Desenvolvimento — Trilha Java Backend + IA Local
+# Backlog de Desenvolvimento — Jarvis Rebuild Mobile-First
 
-## Objetivo
+## Direção corrigida
 
-Construir um portfólio forte e realista para empregabilidade como **Desenvolvedor Java Backend / Fullstack Java**, usando um projeto principal com cara de produto: um sistema local inspirado no Jarvis, mas organizado como plataforma profissional.
+Este backlog substitui o plano genérico anterior.
 
-A ideia é desenvolver em etapas, como se fosse um projeto real de empresa:
+A meta **não** é criar um CRUD bonito para portfólio. A meta é recriar o **Jarvis de verdade**, com o que ele já faz hoje, só que de forma mais organizada, testável, mobile-first e profissional.
 
-1. Backend Java/Spring Boot sólido.
-2. Banco PostgreSQL bem modelado.
-3. Jobs assíncronos e rastreáveis.
-4. Testes automatizados.
-5. Frontend React/TypeScript funcional.
-6. Integração com IA local como diferencial.
-7. Documentação profissional no GitHub.
+O projeto deve servir para três objetivos ao mesmo tempo:
+
+1. **Jarvis real**: importar EPUB EN/PT, mapear capítulos, alinhar parágrafos/sentenças, validar pares, consolidar memória e preparar tradução.
+2. **Aprendizado forte**: desenvolver na mão, entendendo Java backend, arquitetura, banco, jobs, frontend e IA local.
+3. **Empregabilidade**: virar um projeto de GitHub que prove domínio de Java/Spring, PostgreSQL, processamento assíncrono, dados, testes, frontend e IA aplicada.
 
 ---
 
-# Produto-base sugerido
+# Visão do produto
 
 ## Nome do projeto
 
 **Jarvis Workbench**
 
-## Descrição curta
+## Descrição real
 
-Sistema local para processamento de textos, execução de jobs longos, alinhamento bilíngue, memória RAG e tradução assistida por IA local.
+Sistema local, mobile-first, para importar pares de livros EPUB em inglês e português brasileiro, extrair estrutura textual, mapear capítulos, alinhar parágrafos/sentenças, validar qualidade dos pares, consolidar memória bilíngue e apoiar tradução literária assistida por IA local.
 
-## Descrição para currículo
+## Frase de currículo
 
-Plataforma em Java/Spring Boot para ingestão, processamento assíncrono e análise de textos bilíngues, com PostgreSQL, controle de jobs, logs, validações, busca semântica e integração com modelos locais via API.
+Desenvolvi uma plataforma local em Java/Spring Boot e React para ingestão e alinhamento de livros EPUB EN/PT-BR, com processamento assíncrono, PostgreSQL, jobs rastreáveis, validação de pares bilíngues, embeddings multilíngues, memória RAG e interface mobile-first.
+
+---
+
+# Princípios arquiteturais
+
+## 1. Backend Java é o coração
+
+O sistema principal deve ser Java/Spring Boot.
+
+Python pode existir depois como apoio para tarefas específicas, mas o produto principal deve provar força em Java.
+
+## 2. Mobile-first desde a primeira tela
+
+A UI deve nascer pensando em celular:
+
+- telas estreitas primeiro;
+- cards em vez de tabelas gigantes;
+- ações grandes e fáceis de tocar;
+- progresso claro dos jobs;
+- leitura confortável de pares EN/PT;
+- modo revisão adaptado ao celular.
+
+Depois adaptamos para desktop.
+
+## 3. Jobs longos são parte central
+
+Importar EPUB, segmentar, gerar embeddings e alinhar são processos longos.
+
+Então job engine não é genérico: é necessidade real do Jarvis.
+
+## 4. Nada de toy project
+
+Desde cedo o sistema deve trabalhar com EPUB real, capítulos reais, parágrafos reais e alinhamento real.
+
+## 5. Desenvolvimento por estórias pequenas
+
+Mesmo sendo um projeto grande, cada entrega deve ser pequena, testável e revisável.
 
 ---
 
@@ -36,167 +71,254 @@ Plataforma em Java/Spring Boot para ingestão, processamento assíncrono e anál
 
 ## Backend
 
-* Java 21
-* Spring Boot
-* Spring Web
-* Spring Data JPA
-* Spring Validation
-* Spring Security, em fase posterior
-* PostgreSQL
-* Flyway
-* JUnit 5
-* Mockito
-* Testcontainers
-* OpenAPI/Swagger
+- Java 21
+- Spring Boot 3.5.x
+- Spring Web
+- Spring Data JPA
+- Spring Validation
+- PostgreSQL
+- Flyway
+- JUnit 5
+- Mockito
+- Testcontainers
+- OpenAPI/Swagger em fase posterior
+
+## EPUB / texto
+
+Começar com solução Java.
+
+Possíveis caminhos:
+
+- biblioteca EPUB Java para leitura inicial;
+- Jsoup para limpar XHTML interno;
+- fallback manual lendo estrutura ZIP/OPF se necessário;
+- ICU4J ou BreakIterator em fase posterior para segmentação melhor.
 
 ## Frontend
 
-* React
-* TypeScript
-* Tailwind CSS
-* Shadcn/ui
-* React Hook Form
-* Zod
-* TanStack Query
+- React
+- TypeScript
+- Tailwind CSS
+- Shadcn/ui
+- React Hook Form
+- Zod
+- TanStack Query
+- Mobile-first
 
-## IA local / dados
+## IA / embeddings
 
-* Ollama ou outro servidor local compatível com HTTP
-* pgvector em fase posterior
-* embeddings locais
-* PostgreSQL JSONB para metadados
+- LaBSE ONNX Java, se mantivermos caminho atual;
+- Ollama para LLM local;
+- embeddings locais em fase posterior;
+- pgvector em fase posterior.
 
 ---
 
-# Padrão de desenvolvimento
+# Estrutura de módulos backend
 
-## Definição de pronto geral
+Estrutura alvo:
 
-Uma estória só é considerada pronta quando tiver:
+```text
+src/main/java/com/dnobretech/jarvisworkbench/
 
-* endpoint funcional;
-* validação de entrada;
-* tratamento de erro;
-* persistência correta;
-* teste unitário ou de integração quando fizer sentido;
-* documentação mínima no README ou Swagger;
-* commits pequenos e claros;
-* nenhum código morto ou gambiarra sem justificativa.
+  health/
+    api/
+    dto/
 
-## Padrão de branches
+  job/
+    api/
+    application/
+    domain/
+    repository/
+    dto/
 
-* `main`: versão estável.
-* `develop`: integração.
-* `feature/JW-001-nome-da-feature`: desenvolvimento de estória.
-* `fix/JW-xxx-nome-do-fix`: correção.
+  epub/
+    api/
+    application/
+    domain/
+    repository/
+    dto/
+    parser/
 
-## Padrão de commits
+  book/
+    api/
+    application/
+    domain/
+    repository/
+    dto/
 
-Exemplos:
+  text/
+    segmentation/
+    normalization/
+    similarity/
 
-* `feat: create job entity and repository`
-* `feat: add job creation endpoint`
-* `test: add job service tests`
-* `fix: validate invalid job type`
-* `docs: update README with job API examples`
+  alignment/
+    api/
+    application/
+    domain/
+    repository/
+    dto/
+    algorithm/
+    scoring/
+
+  embedding/
+    application/
+    provider/
+    dto/
+
+  memory/
+    api/
+    application/
+    domain/
+    repository/
+    dto/
+
+  translation/
+    api/
+    application/
+    dto/
+
+  shared/
+    error/
+    config/
+    pagination/
+    time/
+```
+
+---
+
+# Modelo de execução revisado
+
+## Fase 0 — Fundação
+
+Criar base do projeto com health check, banco, migrations e erro padronizado.
+
+## Fase 1 — Job engine real
+
+Criar engine de jobs porque tudo no Jarvis depende disso.
+
+## Fase 2 — Núcleo EPUB
+
+Importar EPUB real, extrair estrutura, capítulos e parágrafos.
+
+## Fase 3 — Par de livros EN/PT
+
+Criar entidade para par de livros, importar dois EPUBs e organizar capítulos/parágrafos dos dois lados.
+
+## Fase 4 — Macro alinhamento
+
+Recriar o alinhamento maneiro atual: janela de parágrafos, candidatos, score, skip, merge e rastreabilidade.
+
+## Fase 5 — Revisão mobile-first
+
+Criar telas para revisar importação, capítulos, parágrafos e pares alinhados no celular.
+
+## Fase 6 — Alinhamento fino/sentenças
+
+Quebrar pares aprovados em sentenças e alinhar com mais precisão.
+
+## Fase 7 — Validação e qualidade
+
+Criar métricas, flags, score final e revisão assistida.
+
+## Fase 8 — Memória canônica/RAG
+
+Consolidar pares aprovados em memória pesquisável.
+
+## Fase 9 — Tradução assistida
+
+Usar memória, glossário e IA local para sugerir tradução e revisão.
 
 ---
 
 # Épico 0 — Fundação do projeto
 
-## Objetivo
+## JW-001 — Health check e base Spring Boot
 
-Criar a base profissional do projeto, com estrutura limpa, banco configurado, migrations, documentação inicial e ambiente preparado para evoluir.
+Status: **DONE**
+
+### Objetivo
+
+Criar projeto Spring Boot base, endpoint de saúde e README inicial.
 
 ---
 
-## JW-001 — Criar projeto Spring Boot base
+## JW-002 — Configurar PostgreSQL e Flyway para o Jarvis real
 
 ### Estória
 
-Como desenvolvedor, quero criar a estrutura inicial do backend em Spring Boot para ter uma base organizada e pronta para evolução.
+Como desenvolvedor, quero configurar PostgreSQL e Flyway para que o Jarvis tenha um banco versionado e pronto para armazenar livros, EPUBs, capítulos, parágrafos, jobs e alinhamentos.
 
 ### Regras de negócio
 
-* O projeto deve iniciar sem erro.
-* Deve ter um endpoint simples de health check.
-* A estrutura deve separar camadas de controller, service, repository, entity e dto.
+- Toda tabela deve nascer via migration.
+- O backend não deve depender de `ddl-auto=create`.
+- A aplicação deve usar PostgreSQL local.
+- Configurações sensíveis devem ficar fora do código.
+- A migration inicial deve preparar a base para o Jarvis, não uma tabela de teste sem sentido.
 
-### Critérios de aceite
+### Escopo da JW-002
+JW-002 — DONE
 
-* Aplicação sobe localmente.
-* Endpoint `GET /api/health` retorna status `200`.
-* Resposta esperada:
+Criar apenas a infraestrutura de banco e uma tabela simples de controle da aplicação.
 
-```json
-{
-  "status": "UP",
-  "service": "jarvis-workbench-api"
-}
+Ainda não criaremos tabelas de EPUB, jobs ou alinhamento nesta estória.
+
+### Dependências Maven esperadas
+
+- `spring-boot-starter-data-jpa`
+- `postgresql`
+- `flyway-core`
+- `flyway-database-postgresql`, se necessário na versão usada
+
+### Arquivos esperados
+
+```text
+src/main/resources/application.yml
+src/main/resources/application-local.yml
+src/main/resources/db/migration/V1__init_schema.sql
 ```
 
-### Tarefas técnicas
+### Configuração esperada
 
-* Criar projeto com Java 21 e Spring Boot.
-* Adicionar dependências principais.
-* Criar pacote base.
-* Criar `HealthController`.
-* Criar README inicial.
-
-### O que quero ver no code review
-
-* Pacotes bem nomeados.
-* Sem regra de negócio no controller.
-* README explicando como rodar.
-
----
-
-## JW-002 — Configurar PostgreSQL e Flyway
-
-### Estória
-
-Como desenvolvedor, quero configurar PostgreSQL e Flyway para versionar o banco de dados de forma profissional.
-
-### Regras de negócio
-
-* Nenhuma tabela deve ser criada manualmente fora de migration.
-* O sistema deve falhar ao iniciar se o banco estiver inacessível.
-* Toda alteração estrutural no banco deve virar uma migration.
+- Profile local configurável.
+- Datasource apontando para PostgreSQL local.
+- JPA sem criar tabela automaticamente.
+- Flyway habilitado.
 
 ### Critérios de aceite
 
-* Aplicação conecta no PostgreSQL.
-* Flyway executa migration inicial.
-* Existe uma tabela inicial chamada `app_schema_version_test` ou equivalente simples para validar a migração.
-
-### Tarefas técnicas
-
-* Configurar datasource.
-* Adicionar Flyway.
-* Criar migration `V1__init.sql`.
-* Atualizar README com instruções de banco.
+- Aplicação sobe conectando no PostgreSQL.
+- Flyway executa `V1__init_schema.sql`.
+- Tabela `app_info` ou equivalente é criada.
+- `ddl-auto` não está como `create` ou `update`.
+- README explica como criar banco local.
+- Health check continua funcionando.
+- Testes existentes continuam passando.
 
 ### O que quero ver no code review
 
-* Nada de `spring.jpa.hibernate.ddl-auto=create`.
-* Configuração separada por profile.
-* Senhas fora do código.
+- Configuração limpa.
+- Sem senha hardcoded de forma perigosa.
+- Migration organizada.
+- README claro para rodar no Windows.
 
 ---
 
-## JW-003 — Padronizar resposta de erro
+## JW-003 — Erro padronizado da API
 
 ### Estória
 
-Como consumidor da API, quero receber erros em formato padronizado para conseguir entender e tratar falhas corretamente.
+Como usuário da API, quero receber erros padronizados para entender falhas de validação, recurso inexistente e erros internos.
 
 ### Regras de negócio
 
-* Toda exceção conhecida deve retornar JSON padronizado.
-* Erros de validação devem informar campo e mensagem.
-* Erros inesperados não devem vazar stack trace para o cliente.
+- Erros devem retornar JSON consistente.
+- Validação deve mostrar campos inválidos.
+- Erros inesperados não devem vazar stack trace.
+- O formato deve servir para backend e frontend mobile.
 
-### Modelo de erro
+### Modelo esperado
 
 ```json
 {
@@ -204,10 +326,10 @@ Como consumidor da API, quero receber erros em formato padronizado para consegui
   "status": 400,
   "error": "VALIDATION_ERROR",
   "message": "Invalid request data",
-  "path": "/api/jobs",
+  "path": "/api/example",
   "fields": [
     {
-      "name": "type",
+      "name": "sourceLang",
       "message": "must not be blank"
     }
   ]
@@ -216,1002 +338,2159 @@ Como consumidor da API, quero receber erros em formato padronizado para consegui
 
 ### Critérios de aceite
 
-* Erro de validação retorna `400`.
-* Recurso não encontrado retorna `404`.
-* Erro inesperado retorna `500` com mensagem segura.
-
-### Tarefas técnicas
-
-* Criar DTO de erro.
-* Criar `GlobalExceptionHandler`.
-* Criar exceção base de negócio.
-* Testar ao menos um caso de validação.
-
-### O que quero ver no code review
-
-* Erros consistentes.
-* Sem `try/catch` espalhado em controller.
-* Mensagens úteis, mas sem vazar detalhe interno.
+- Erro de validação retorna 400.
+- Recurso não encontrado retorna 404.
+- Erro de negócio retorna 422 ou 400, conforme caso.
+- Erro interno retorna 500 seguro.
 
 ---
 
-# Épico 1 — Engine de jobs assíncronos
+# Épico 1 — Job engine real do Jarvis
 
-## Objetivo
-
-Criar um módulo profissional para controlar processos longos. Esse módulo será útil tanto para o Jarvis quanto para portfólio de Java backend.
-
----
-
-## JW-010 — Criar entidade Job
+## JW-010 — Criar entidade JobExecution
 
 ### Estória
 
-Como sistema, quero registrar jobs no banco para acompanhar processamentos longos com status, progresso e metadados.
+Como sistema, quero registrar processamentos longos para acompanhar importação EPUB, segmentação, alinhamento e tradução.
 
-### Regras de negócio
+### Tipos iniciais de job
 
-* Todo job deve ter um identificador único.
-* Todo job começa com status `PENDING`.
-* Todo job deve ter um tipo.
-* O progresso inicial deve ser `0`.
-* O progresso máximo deve ser `100`.
-* O job pode ter metadados em JSON.
+- `EPUB_IMPORT`
+- `BOOK_PAIR_IMPORT`
+- `CHAPTER_MAPPING`
+- `PARAGRAPH_ALIGNMENT`
+- `SENTENCE_ALIGNMENT`
+- `MEMORY_BUILD`
+- `TRANSLATION_RUN`
+
+### Status
+
+- `PENDING`
+- `RUNNING`
+- `COMPLETED`
+- `FAILED`
+- `CANCELLED`
 
 ### Campos sugeridos
 
 Tabela: `job_execution`
 
-* `id`
-* `public_id`
-* `type`
-* `status`
-* `progress`
-* `current_step`
-* `total_steps`
-* `message`
-* `metadata_json`
-* `created_at`
-* `started_at`
-* `finished_at`
-* `updated_at`
-* `error_code`
-* `error_message`
-
-### Status permitidos
-
-* `PENDING`
-* `RUNNING`
-* `COMPLETED`
-* `FAILED`
-* `CANCELLED`
+- `id`
+- `public_id`
+- `type`
+- `status`
+- `progress`
+- `current_step`
+- `total_steps`
+- `message`
+- `metadata_json`
+- `created_at`
+- `started_at`
+- `finished_at`
+- `updated_at`
+- `error_code`
+- `error_message`
 
 ### Critérios de aceite
 
-* Migration cria tabela `job_execution`.
-* Entidade JPA representa a tabela.
-* Repository consegue salvar e buscar job.
-* Teste de repository valida persistência básica.
-
-### Tarefas técnicas
-
-* Criar enum `JobStatus`.
-* Criar enum ou campo controlado para `JobType`.
-* Criar entity `JobExecution`.
-* Criar repository.
-* Criar migration.
-* Criar teste com Testcontainers ou teste de repository.
-
-### O que quero ver no code review
-
-* Uso correto de enum.
-* Datas bem tratadas.
-* `public_id` separado do ID interno.
-* Índices para status e tipo.
+- Migration cria tabela.
+- Entity JPA criada.
+- Repository criado.
+- Job novo começa como `PENDING` e progresso `0`.
+- Teste de persistência básico.
 
 ---
 
-## JW-011 — Criar endpoint para iniciar job
+## JW-011 — Criar, consultar e listar jobs
 
 ### Estória
 
-Como usuário da API, quero criar um job para iniciar um processamento controlado pelo sistema.
+Como usuário, quero criar e consultar jobs para acompanhar processos do Jarvis pelo celular.
 
-### Endpoint
+### Endpoints
 
-`POST /api/jobs`
-
-### Request
-
-```json
-{
-  "type": "TEXT_IMPORT",
-  "metadata": {
-    "source": "manual-test",
-    "description": "Primeiro teste de job"
-  }
-}
-```
-
-### Response
-
-```json
-{
-  "id": "job_abc123",
-  "type": "TEXT_IMPORT",
-  "status": "PENDING",
-  "progress": 0,
-  "message": "Job created successfully"
-}
+```http
+POST /api/jobs
+GET /api/jobs/{publicId}
+GET /api/jobs?status=RUNNING&type=EPUB_IMPORT&page=0&size=20
 ```
 
 ### Regras de negócio
 
-* `type` é obrigatório.
-* Se o tipo não for suportado, retornar `400`.
-* O job deve ser persistido antes de qualquer processamento.
-* O endpoint não deve executar trabalho pesado diretamente.
+- Criar job não deve executar processamento pesado diretamente.
+- Listagem deve ser paginada.
+- Tamanho máximo da página: 100.
+- Resposta deve ser amigável para cards mobile.
 
 ### Critérios de aceite
 
-* Criar job válido retorna `201`.
-* Criar job sem tipo retorna `400`.
-* Criar job com tipo inválido retorna `400`.
-* Job criado aparece no banco com status `PENDING`.
-
-### Tarefas técnicas
-
-* Criar DTO de request.
-* Criar DTO de response.
-* Criar service `JobService`.
-* Criar controller.
-* Criar validações.
-* Criar testes de service e controller.
-
-### O que quero ver no code review
-
-* Controller fino.
-* Service com regra de negócio.
-* DTOs separados da entity.
-* Validação clara.
+- Cria job válido.
+- Consulta por ID público.
+- Lista com filtros.
+- Não expõe ID interno do banco.
 
 ---
 
-## JW-012 — Consultar job por ID público
+## JW-012 — Ciclo de vida do job
 
 ### Estória
 
-Como usuário da API, quero consultar um job pelo ID público para acompanhar o status do processamento.
-
-### Endpoint
-
-`GET /api/jobs/{publicId}`
-
-### Response
-
-```json
-{
-  "id": "job_abc123",
-  "type": "TEXT_IMPORT",
-  "status": "RUNNING",
-  "progress": 45,
-  "currentStep": 3,
-  "totalSteps": 7,
-  "message": "Processing paragraphs",
-  "createdAt": "2026-05-10T12:00:00",
-  "startedAt": "2026-05-10T12:00:05",
-  "finishedAt": null
-}
-```
+Como sistema, quero iniciar, atualizar progresso, concluir e falhar jobs com regras consistentes.
 
 ### Regras de negócio
 
-* Buscar por `public_id`, não pelo ID interno.
-* Se não encontrar, retornar `404`.
-* Não expor campos internos desnecessários.
+- `PENDING` pode virar `RUNNING`.
+- `RUNNING` pode virar `COMPLETED`, `FAILED` ou `CANCELLED`.
+- `COMPLETED` não volta para outro status.
+- `FAILED` não vira `COMPLETED` sem novo job.
+- Progresso deve ficar entre 0 e 100.
+- `finished_at` deve ser preenchido ao finalizar.
 
 ### Critérios de aceite
 
-* Job existente retorna `200`.
-* Job inexistente retorna `404`.
-* Response não expõe ID interno do banco.
-
-### Tarefas técnicas
-
-* Criar método no repository.
-* Criar método no service.
-* Criar endpoint.
-* Criar mapper entity → response.
-* Testar caso encontrado e não encontrado.
-
-### O que quero ver no code review
-
-* Nada de retornar entity direto.
-* Erro 404 padronizado.
-* Mapper limpo.
+- Transições válidas funcionam.
+- Transições inválidas falham.
+- Testes cobrem regras principais.
 
 ---
 
-## JW-013 — Listar jobs com filtros e paginação
+## JW-013 — Log de eventos do job
 
 ### Estória
 
-Como usuário, quero listar jobs com filtros para encontrar execuções por status, tipo e data.
-
-### Endpoint
-
-`GET /api/jobs?status=RUNNING&type=TEXT_IMPORT&page=0&size=20`
-
-### Regras de negócio
-
-* Paginação obrigatória.
-* Tamanho máximo da página: 100.
-* Filtros opcionais: status, type, createdAtFrom, createdAtTo.
-* Ordenação padrão: mais recentes primeiro.
-
-### Critérios de aceite
-
-* Lista jobs paginados.
-* Filtra por status.
-* Filtra por tipo.
-* Não permite `size` maior que 100.
-* Retorna metadados de paginação.
-
-### Tarefas técnicas
-
-* Criar query com Specification ou métodos derivados simples.
-* Criar DTO de filtro.
-* Criar response paginado.
-* Testar paginação e filtros.
-
-### O que quero ver no code review
-
-* Query organizada.
-* Sem carregar tudo em memória para filtrar.
-* Paginação real no banco.
-
----
-
-## JW-014 — Atualizar progresso do job
-
-### Estória
-
-Como sistema, quero atualizar o progresso de um job para informar em que etapa o processamento está.
-
-### Regras de negócio
-
-* Só jobs `PENDING` ou `RUNNING` podem receber progresso.
-* Ao iniciar o processamento, status muda para `RUNNING`.
-* Progresso não pode diminuir sem justificativa técnica.
-* Progresso deve ficar entre `0` e `100`.
-* Quando progresso chega a `100`, o job ainda não deve virar `COMPLETED` automaticamente; conclusão é uma ação separada.
-
-### Critérios de aceite
-
-* Atualizar progresso válido persiste no banco.
-* Progresso menor que 0 retorna erro.
-* Progresso maior que 100 retorna erro.
-* Job `COMPLETED`, `FAILED` ou `CANCELLED` não pode ser atualizado.
-
-### Tarefas técnicas
-
-* Criar método interno no service.
-* Criar validação de status.
-* Criar testes unitários.
-
-### O que quero ver no code review
-
-* Regra centralizada no service.
-* Mensagens de erro claras.
-* Nenhuma atualização inconsistente de status.
-
----
-
-## JW-015 — Finalizar job com sucesso
-
-### Estória
-
-Como sistema, quero marcar um job como concluído para registrar o fim de um processamento bem-sucedido.
-
-### Regras de negócio
-
-* Apenas job `RUNNING` pode ser concluído.
-* Ao concluir, status vira `COMPLETED`.
-* `finished_at` deve ser preenchido.
-* Progresso deve virar `100`.
-* Mensagem final deve ser registrada.
-
-### Critérios de aceite
-
-* Job `RUNNING` pode ser concluído.
-* Job já finalizado não pode ser concluído novamente.
-* Datas são preenchidas corretamente.
-
-### Tarefas técnicas
-
-* Criar método `completeJob`.
-* Criar testes de transição de status.
-
-### O que quero ver no code review
-
-* Máquina de estados respeitada.
-* Testes cobrindo transições inválidas.
-
----
-
-## JW-016 — Finalizar job com erro
-
-### Estória
-
-Como sistema, quero marcar um job como falho para registrar erro e permitir diagnóstico.
-
-### Regras de negócio
-
-* Job `PENDING` ou `RUNNING` pode virar `FAILED`.
-* Deve salvar `error_code`.
-* Deve salvar `error_message`.
-* Deve preencher `finished_at`.
-* Não deve salvar stack trace gigante no campo principal.
-
-### Critérios de aceite
-
-* Falha é persistida corretamente.
-* Erro aparece na consulta do job.
-* Job `COMPLETED` não pode virar `FAILED`.
-
-### Tarefas técnicas
-
-* Criar método `failJob`.
-* Criar enum ou constantes de error code.
-* Criar testes.
-
-### O que quero ver no code review
-
-* Tratamento seguro de erro.
-* Separação entre mensagem para usuário e detalhe técnico.
-
----
-
-# Épico 2 — Upload e ingestão de texto
-
-## Objetivo
-
-Criar uma funcionalidade simples e útil para importar textos. Antes de processar EPUB real, começar com TXT/Markdown para validar arquitetura.
-
----
-
-## JW-020 — Upload de arquivo TXT/Markdown
-
-### Estória
-
-Como usuário, quero enviar um arquivo de texto para que o sistema crie uma fonte processável.
-
-### Endpoint
-
-`POST /api/documents/upload`
-
-### Regras de negócio
-
-* Aceitar apenas `.txt` e `.md` no primeiro momento.
-* Tamanho máximo inicial: 10 MB.
-* O conteúdo deve ser salvo no banco ou em armazenamento local controlado.
-* O documento deve ter status `IMPORTED`.
-* O sistema deve registrar nome original, tamanho e tipo.
-
-### Critérios de aceite
-
-* Upload válido retorna `201`.
-* Arquivo vazio retorna `400`.
-* Extensão inválida retorna `400`.
-* Arquivo acima do limite retorna `400`.
-
-### Tarefas técnicas
-
-* Criar tabela `document_source`.
-* Criar endpoint multipart.
-* Criar validação de tipo e tamanho.
-* Criar service de armazenamento.
-* Criar testes.
-
-### O que quero ver no code review
-
-* Validação antes de persistir.
-* Nada de path inseguro.
-* Nome original tratado com cuidado.
-
----
-
-## JW-021 — Listar documentos importados
-
-### Estória
-
-Como usuário, quero listar documentos importados para escolher qual processar.
-
-### Endpoint
-
-`GET /api/documents?page=0&size=20`
-
-### Regras de negócio
-
-* Listagem paginada.
-* Ordenar por data de importação desc.
-* Não retornar conteúdo completo na listagem.
-
-### Critérios de aceite
-
-* Retorna documentos paginados.
-* Não retorna texto inteiro.
-* Documento inexistente não quebra listagem.
-
-### Tarefas técnicas
-
-* Criar DTO resumido.
-* Criar endpoint.
-* Criar teste.
-
----
-
-## JW-022 — Consultar detalhe de documento
-
-### Estória
-
-Como usuário, quero consultar os detalhes de um documento para verificar metadados e status.
-
-### Endpoint
-
-`GET /api/documents/{id}`
-
-### Regras de negócio
-
-* Buscar por ID público.
-* Retornar metadados.
-* Retornar preview curto do conteúdo.
-* Não retornar conteúdo completo se for muito grande.
-
-### Critérios de aceite
-
-* Documento existente retorna `200`.
-* Documento inexistente retorna `404`.
-* Preview tem limite de caracteres.
-
----
-
-# Épico 3 — Segmentação de texto
-
-## Objetivo
-
-Criar processamento de texto em partes menores: parágrafos e sentenças. Isso é útil para Jarvis, NLP e demonstração técnica.
-
----
-
-## JW-030 — Criar job de segmentação por parágrafos
-
-### Estória
-
-Como usuário, quero iniciar uma segmentação de documento em parágrafos para preparar o texto para processamento posterior.
-
-### Endpoint
-
-`POST /api/documents/{documentId}/segment/paragraphs`
-
-### Regras de negócio
-
-* Deve criar um job do tipo `PARAGRAPH_SEGMENTATION`.
-* O processamento deve ser assíncrono.
-* Cada parágrafo deve ter índice sequencial.
-* Parágrafos vazios devem ser ignorados.
-* O texto original não deve ser alterado.
-
-### Critérios de aceite
-
-* Endpoint retorna job criado.
-* Job processa documento e gera parágrafos.
-* Parágrafos são salvos com ordem correta.
-* Job finaliza como `COMPLETED` em caso de sucesso.
-* Job finaliza como `FAILED` em caso de erro.
-
-### Tarefas técnicas
-
-* Criar tabela `document_paragraph`.
-* Criar service de segmentação.
-* Criar executor simples assíncrono.
-* Integrar com JobService.
-* Criar testes de segmentação.
-
-### O que quero ver no code review
-
-* Algoritmo simples e legível.
-* Separação entre orquestração de job e lógica de segmentação.
-* Testes com casos de linha vazia, múltiplas quebras e espaços.
-
----
-
-## JW-031 — Consultar parágrafos de um documento
-
-### Estória
-
-Como usuário, quero consultar os parágrafos segmentados de um documento para validar se a segmentação ficou correta.
-
-### Endpoint
-
-`GET /api/documents/{documentId}/paragraphs?page=0&size=50`
-
-### Regras de negócio
-
-* Retornar parágrafos ordenados pelo índice.
-* Paginação obrigatória.
-* Não permitir `size` maior que 200.
-
-### Critérios de aceite
-
-* Retorna parágrafos em ordem.
-* Documento sem segmentação retorna lista vazia.
-* Documento inexistente retorna `404`.
-
----
-
-## JW-032 — Criar segmentação por sentenças
-
-### Estória
-
-Como usuário, quero segmentar parágrafos em sentenças para preparar alinhamento e análise textual.
-
-### Regras de negócio
-
-* Cada sentença pertence a um parágrafo.
-* Cada sentença tem índice global e índice dentro do parágrafo.
-* O sistema deve preservar pontuação.
-* Não deve quebrar em abreviações comuns quando possível.
-
-### Critérios de aceite
-
-* Sentenças são salvas em ordem.
-* Cada sentença referencia o parágrafo de origem.
-* Casos básicos com ponto, interrogação e exclamação funcionam.
-
-### Tarefas técnicas
-
-* Criar tabela `document_sentence`.
-* Criar sentence splitter inicial.
-* Criar testes com exemplos.
-
-### Observação de arquitetura
-
-No início, o splitter pode ser simples. Depois podemos evoluir para ICU4J, OpenNLP, spaCy externo ou outro segmentador.
-
----
-
-# Épico 4 — Pares bilíngues e alinhamento simples
-
-## Objetivo
-
-Criar a base para alinhar textos EN/PT de forma controlada, começando simples e evoluindo.
-
----
-
-## JW-040 — Criar entidade DocumentPair
-
-### Estória
-
-Como usuário, quero vincular um documento de origem e um documento de destino para representar um par bilíngue.
-
-### Endpoint
-
-`POST /api/document-pairs`
-
-### Request
-
-```json
-{
-  "sourceDocumentId": "doc_en_123",
-  "targetDocumentId": "doc_pt_456",
-  "sourceLang": "en",
-  "targetLang": "pt-BR",
-  "name": "Livro teste EN/PT"
-}
-```
-
-### Regras de negócio
-
-* Documento origem e destino devem existir.
-* Idiomas são obrigatórios.
-* Não pode criar par com o mesmo documento dos dois lados.
-* Nome é obrigatório.
-
-### Critérios de aceite
-
-* Par válido retorna `201`.
-* Documento inexistente retorna `404`.
-* Mesmo documento dos dois lados retorna `400`.
-
-### Tarefas técnicas
-
-* Criar tabela `document_pair`.
-* Criar DTOs.
-* Criar service.
-* Criar endpoint.
-* Criar testes.
-
----
-
-## JW-041 — Alinhamento baseline por índice
-
-### Estória
-
-Como usuário, quero gerar um alinhamento inicial por índice para ter uma baseline simples de comparação.
-
-### Regras de negócio
-
-* O parágrafo 1 da origem é alinhado com o parágrafo 1 do destino.
-* O processo continua até acabar um dos lados.
-* Pares excedentes devem ser marcados como não alinhados.
-* Esse alinhamento deve ser identificado como `INDEX_BASELINE`.
-
-### Critérios de aceite
-
-* Gera pares 1→1 por índice.
-* Registra algoritmo usado.
-* Registra score padrão ou nulo.
-* Mantém rastreabilidade dos parágrafos originais.
-
-### Tarefas técnicas
-
-* Criar tabela `alignment_pair`.
-* Criar enum `AlignmentAlgorithm`.
-* Criar job de alinhamento baseline.
-* Criar endpoint para iniciar alinhamento.
-* Criar consulta de pares alinhados.
-
-### O que quero ver no code review
-
-* Rastreabilidade boa.
-* Nenhum texto perdido.
-* Algoritmo isolado em classe própria.
-
----
-
-## JW-042 — Calcular heurística de tamanho do par
-
-### Estória
-
-Como sistema, quero calcular uma pontuação simples baseada na diferença de tamanho entre origem e destino para indicar possíveis pares ruins.
-
-### Regras de negócio
-
-* Comparar quantidade de caracteres ou tokens simples.
-* Ratio muito baixo ou muito alto deve reduzir score.
-* Score deve ficar entre 0 e 1.
-* A heurística não decide sozinha se o par é certo; ela apenas ajuda.
-
-### Critérios de aceite
-
-* Pares com tamanhos parecidos recebem score alto.
-* Pares muito desbalanceados recebem score baixo.
-* Score é persistido no alinhamento.
-
-### Tarefas técnicas
-
-* Criar classe `LengthRatioScorer`.
-* Criar testes unitários.
-* Integrar ao alinhamento baseline.
-
----
-
-# Épico 5 — Memória RAG básica
-
-## Objetivo
-
-Criar uma memória textual pesquisável, primeiro com busca textual simples e depois com embeddings.
-
----
-
-## JW-050 — Aprovar par alinhado para memória
-
-### Estória
-
-Como usuário, quero aprovar um par alinhado para que ele entre na memória canônica do sistema.
-
-### Regras de negócio
-
-* Apenas pares existentes podem ser aprovados.
-* Um par aprovado gera registro em `memory_pair`.
-* O sistema deve preservar origem, destino, algoritmo e scores.
-* Não deve duplicar o mesmo par aprovado.
-
-### Critérios de aceite
-
-* Aprovar par cria memória.
-* Aprovar o mesmo par duas vezes não duplica.
-* Memória mantém referência ao alinhamento original.
-
-### Tarefas técnicas
-
-* Criar tabela `memory_pair`.
-* Criar endpoint de aprovação.
-* Criar service.
-* Criar testes.
-
----
-
-## JW-051 — Buscar memória por texto simples
-
-### Estória
-
-Como usuário, quero buscar pares aprovados por texto para reutilizar exemplos de tradução.
-
-### Endpoint
-
-`GET /api/memory/search?q=dragon`
-
-### Regras de negócio
-
-* Buscar em texto de origem e destino.
-* Retornar no máximo 20 resultados inicialmente.
-* Ordenar por relevância simples ou data.
-
-### Critérios de aceite
-
-* Busca encontra pares contendo termo.
-* Busca vazia retorna erro `400`.
-* Resultado inclui origem, destino e metadados.
-
----
-
-## JW-052 — Preparar estrutura para embeddings
-
-### Estória
-
-Como sistema, quero preparar a estrutura de embeddings para permitir busca semântica no futuro.
-
-### Regras de negócio
-
-* Um par de memória pode ter múltiplos embeddings.
-* Embeddings podem ser de origem, destino ou par combinado.
-* Deve registrar modelo usado.
-* Deve registrar dimensão.
+Como usuário, quero ver eventos de um job para entender onde a importação ou alinhamento falhou.
 
 ### Tabela sugerida
 
-`memory_embedding`
+`job_event`
 
 Campos:
 
-* `id`
-* `memory_pair_id`
-* `embedding_type`
-* `model_name`
-* `dimension`
-* `vector`
-* `created_at`
+- `id`
+- `job_execution_id`
+- `level`
+- `message`
+- `details_json`
+- `created_at`
+
+### Níveis
+
+- `INFO`
+- `WARN`
+- `ERROR`
+- `DEBUG`
 
 ### Critérios de aceite
 
-* Migration criada.
-* Entidade criada.
-* Ainda não precisa gerar embedding de verdade.
+- Job pode registrar eventos.
+- Endpoint retorna timeline do job.
+- Frontend mobile consegue exibir os eventos como lista.
 
 ---
 
-# Épico 6 — Integração com IA local
+# Épico 2 — Importação EPUB real
 
-## Objetivo
-
-Conectar o backend a um modelo local via HTTP, sem depender de API paga.
-
----
-
-## JW-060 — Criar client HTTP para modelo local
+## JW-020 — Upload de EPUB individual
 
 ### Estória
 
-Como sistema, quero chamar um modelo local via HTTP para gerar respostas a partir de prompts.
-
-### Regras de negócio
-
-* URL do modelo deve vir de configuração.
-* Timeout deve ser configurável.
-* Erros de conexão devem ser tratados.
-* O client não deve estar acoplado a controller.
-
-### Critérios de aceite
-
-* Service consegue enviar prompt e receber resposta.
-* Erro de modelo fora do ar retorna erro controlado.
-* Existe teste mockando o client.
-
-### Tarefas técnicas
-
-* Criar interface `LocalModelClient`.
-* Criar implementação HTTP.
-* Criar DTO de request/response.
-* Criar configuração.
-* Criar teste.
-
----
-
-## JW-061 — Criar endpoint de teste de prompt
-
-### Estória
-
-Como desenvolvedor, quero testar prompts pelo backend para validar a integração com IA local.
+Como usuário, quero enviar um arquivo EPUB para o Jarvis para que ele extraia metadados, capítulos e parágrafos.
 
 ### Endpoint
 
-`POST /api/ai/prompt-test`
+```http
+POST /api/epubs/upload
+```
+
+### Regras de negócio
+
+- Aceitar apenas `.epub`.
+- Tamanho máximo configurável.
+- Salvar nome original, tamanho, hash e data de upload.
+- Não processar pesado dentro do request.
+- Criar job `EPUB_IMPORT`.
+- Preservar arquivo original em storage local ou banco, conforme decisão arquitetural.
+
+### Critérios de aceite
+
+- Upload válido cria registro e job.
+- Arquivo inválido retorna erro padronizado.
+- Arquivo vazio retorna erro.
+- Hash do arquivo é calculado.
+- README explica como testar com Insomnia/Postman.
+
+---
+
+## JW-021 — Extrair estrutura básica do EPUB
+
+### Estória
+
+Como sistema, quero extrair a estrutura do EPUB para identificar título, autor, arquivos internos e ordem de leitura.
+
+### Regras de negócio
+
+- O EPUB deve ser tratado como pacote estruturado.
+- O sistema deve identificar spine/ordem de leitura quando possível.
+- Arquivos XHTML/HTML devem ser lidos em ordem.
+- Conteúdo bruto deve ser preservado para diagnóstico.
+
+### Saídas esperadas
+
+- título, se existir;
+- autor, se existir;
+- idioma, se existir;
+- lista ordenada de documentos internos;
+- status da extração.
+
+### Critérios de aceite
+
+- EPUB real é lido sem erro.
+- Ordem de leitura é respeitada quando disponível.
+- Logs mostram quantos itens foram extraídos.
+
+---
+
+## JW-022 — Extrair capítulos do EPUB
+
+### Estória
+
+Como sistema, quero converter a estrutura interna do EPUB em capítulos processáveis.
+
+### Regras de negócio
+
+- Cada capítulo deve ter índice sequencial.
+- Cada capítulo deve ter título detectado quando possível.
+- Capítulos sem título devem receber label técnico.
+- XHTML deve ser limpo para texto legível.
+- Itálicos e marcações importantes podem virar metadados em fase posterior.
+
+### Tabela sugerida
+
+`epub_chapter`
+
+Campos:
+
+- `id`
+- `epub_id`
+- `chapter_index`
+- `title`
+- `source_href`
+- `raw_html`
+- `plain_text`
+- `char_count`
+- `created_at`
+
+### Critérios de aceite
+
+- Capítulos são salvos em ordem.
+- Texto limpo é gerado.
+- O sistema registra quantidade de caracteres.
+- Endpoint permite listar capítulos do EPUB.
+
+---
+
+## JW-023 — Extrair parágrafos dos capítulos
+
+### Estória
+
+Como sistema, quero extrair parágrafos dos capítulos para preparar alinhamento.
+
+### Regras de negócio
+
+- Parágrafos vazios devem ser ignorados.
+- Parágrafos devem manter ordem global e ordem dentro do capítulo.
+- Parágrafos devem guardar referência ao capítulo.
+- Texto deve ser normalizado sem destruir pontuação.
+- Parágrafo muito pequeno pode ser marcado com flag, mas não descartado automaticamente.
+
+### Tabela sugerida
+
+`epub_paragraph`
+
+Campos:
+
+- `id`
+- `epub_id`
+- `chapter_id`
+- `global_index`
+- `chapter_index`
+- `paragraph_index`
+- `text`
+- `char_count`
+- `token_count_estimate`
+- `flags_json`
+
+### Critérios de aceite
+
+- Parágrafos são salvos em ordem.
+- Endpoint lista parágrafos por EPUB ou capítulo.
+- Casos com múltiplos `<p>` funcionam.
+- Parágrafos com espaços e quebras são normalizados.
+
+---
+
+## JW-024 — Tela mobile de EPUB importado
+
+### Estória
+
+Como usuário no celular, quero ver os EPUBs importados e abrir detalhes de capítulos/parágrafos.
+
+### Regras de UX mobile
+
+- Lista em cards.
+- Mostrar título, idioma, quantidade de capítulos, quantidade de parágrafos e status.
+- Ações grandes: abrir, excluir, reprocessar.
+- Tela de detalhe deve ter abas ou seções recolhíveis.
+
+### Critérios de aceite
+
+- Tela funciona bem em largura de celular.
+- Não usa tabela larga.
+- Usuário consegue abrir capítulos e preview de parágrafos.
+
+---
+
+# Épico 3 — Par de livros EN/PT
+
+## JW-030 — Criar BookPair a partir de dois EPUBs
+
+### Estória
+
+Como usuário, quero vincular um EPUB em inglês e um EPUB em português para criar um par bilíngue processável.
+
+### Endpoint
+
+```http
+POST /api/book-pairs
+```
 
 ### Request
 
 ```json
 {
-  "prompt": "Traduza a frase para português brasileiro: The dragon landed on the tower."
+  "name": "Livro Teste EN/PT",
+  "sourceEpubId": "epub_en_123",
+  "targetEpubId": "epub_pt_456",
+  "sourceLang": "en",
+  "targetLang": "pt-BR"
 }
 ```
 
 ### Regras de negócio
 
-* Endpoint deve ser marcado como experimental.
-* Prompt não pode ser vazio.
-* Deve haver limite de tamanho.
-* Deve registrar tempo de resposta.
+- Os dois EPUBs devem existir.
+- Não pode usar o mesmo EPUB dos dois lados.
+- Idiomas são obrigatórios.
+- Par deve ter status inicial `CREATED`.
 
 ### Critérios de aceite
 
-* Prompt válido retorna resposta.
-* Prompt vazio retorna `400`.
-* Modelo fora do ar retorna erro padronizado.
+- Par válido é criado.
+- Par inválido retorna erro.
+- Tela mobile lista pares de livros.
 
 ---
 
-# Épico 7 — Frontend profissional
-
-## Objetivo
-
-Criar uma interface simples e bonita para demonstrar o backend como produto real.
-
----
-
-## JW-070 — Criar aplicação React base
+## JW-031 — Dashboard mobile do BookPair
 
 ### Estória
 
-Como usuário, quero acessar uma interface web do Jarvis Workbench para usar o sistema sem depender apenas de Postman.
+Como usuário no celular, quero ver o estado geral de um par de livros antes de alinhar.
+
+### Informações exibidas
+
+- nome do par;
+- EPUB origem e destino;
+- idiomas;
+- capítulos EN/PT;
+- parágrafos EN/PT;
+- último job executado;
+- próximos passos recomendados.
+
+### Critérios de aceite
+
+- Tela é legível no celular.
+- Usuário entende se já pode iniciar mapeamento/alinhamento.
+
+---
+
+# Épico 4 — Mapeamento de capítulos
+
+## JW-040 — Mapear capítulos por índice baseline
+
+### Estória
+
+Como sistema, quero gerar um mapeamento inicial de capítulos por índice para ter uma baseline simples.
 
 ### Regras de negócio
 
-* Deve ter layout base.
-* Deve ter navegação entre páginas.
-* Deve consumir health check do backend.
+- Capítulo EN 1 tenta mapear com PT 1.
+- Excedentes ficam como não mapeados.
+- Algoritmo usado deve ser registrado como `CHAPTER_INDEX_BASELINE`.
+
+### Critérios de aceite
+
+- Gera chapter map inicial.
+- Preserva rastreabilidade.
+- Pode ser visualizado no mobile.
+
+---
+
+## JW-041 — Mapear capítulos com embeddings/window
+
+### Estória
+
+Como sistema, quero mapear capítulos usando similaridade semântica e janela para lidar com offset entre versões EN/PT.
+
+### Regras de negócio
+
+- Para cada capítulo EN, buscar candidatos PT em janela próxima.
+- Calcular score semântico.
+- Considerar diferença de tamanho.
+- Permitir offset global.
+- Registrar algoritmo como `CHAPTER_EMBEDDING_WINDOW`.
+
+### Parâmetros iniciais
+
+- `windowK`
+- `expandStep`
+- `maxExpansions`
+- `maxCharsForEmbedding`
+
+### Critérios de aceite
+
+- Gera mapa melhor que baseline em casos com deslocamento.
+- Score é salvo.
+- Capítulos suspeitos ficam marcados.
+
+---
+
+## JW-042 — Tela mobile de revisão do mapa de capítulos
+
+### Estória
+
+Como usuário, quero revisar o mapeamento de capítulos no celular antes de alinhar parágrafos.
+
+### Regras de UX
+
+- Mostrar card EN/PT lado a lado ou empilhado.
+- Mostrar score e flags.
+- Permitir aprovar, rejeitar ou ajustar par.
+- Destacar capítulos sem par.
+
+### Critérios de aceite
+
+- Usuário consegue revisar pelo celular.
+- Pares suspeitos são fáceis de identificar.
+
+---
+
+# Épico 5 — Alinhamento de parágrafos real
+
+## JW-050 — Criar estrutura de AlignmentRun
+
+### Estória
+
+Como sistema, quero registrar uma execução de alinhamento para comparar algoritmos, parâmetros e resultados.
+
+### Tabelas sugeridas
+
+`alignment_run`
+
+- `id`
+- `public_id`
+- `book_pair_id`
+- `algorithm`
+- `status`
+- `parameters_json`
+- `started_at`
+- `finished_at`
+- `summary_json`
+
+`paragraph_alignment_pair`
+
+- `id`
+- `alignment_run_id`
+- `src_start_index`
+- `src_end_index`
+- `tgt_start_index`
+- `tgt_end_index`
+- `src_text`
+- `tgt_text`
+- `alignment_type`
+- `score`
+- `semantic_score`
+- `length_score`
+- `flags_json`
+
+### Critérios de aceite
+
+- AlignmentRun é criado.
+- Pares alinhados são persistidos.
+- Resultados são rastreáveis por run.
+
+---
+
+## JW-051 — Alinhamento baseline por índice de parágrafos
+
+### Estória
+
+Como sistema, quero gerar baseline por índice para comparar com algoritmos melhores.
+
+### Regras de negócio
+
+- Parágrafo EN N com PT N.
+- Excedentes viram `SKIP_SRC` ou `SKIP_TGT`.
+- Score inicial baseado em tamanho.
+
+### Critérios de aceite
+
+- Baseline executa como job.
+- Resultados são consultáveis.
+- Serve como comparação.
+
+---
+
+## JW-052 — Alinhamento por janela de parágrafos
+
+### Estória
+
+Como sistema, quero alinhar parágrafos usando janela de candidatos, permitindo 1→1, 1→2, 2→1 e skips.
+
+### Regras de negócio
+
+- Para cada parágrafo origem, avaliar candidatos próximos no destino.
+- Gerar candidatos 1→1, 1→2 e 2→1 quando fizer sentido.
+- Calcular score composto.
+- Se score baixo, tentar avançar no destino.
+- Não permitir cruzamento de ordem.
+- Registrar tipo do alinhamento.
+
+### Tipos
+
+- `ONE_TO_ONE`
+- `ONE_TO_MANY`
+- `MANY_TO_ONE`
+- `SKIP_SRC`
+- `SKIP_TGT`
+- `UNCERTAIN`
+
+### Critérios de aceite
+
+- Algoritmo funciona em livro com desbalanceamento de parágrafos.
+- Pares 1→2 e 2→1 aparecem corretamente.
+- Skips são registrados.
+- Score e flags são salvos.
+
+---
+
+## JW-053 — Score composto de alinhamento
+
+### Estória
+
+Como sistema, quero calcular um score composto para avaliar qualidade do par alinhado.
+
+### Componentes iniciais
+
+- score semântico;
+- score de tamanho;
+- penalidade por texto muito curto;
+- penalidade por divergência extrema;
+- bônus por termos-chave compartilhados, em fase posterior.
+
+### Critérios de aceite
+
+- Score final fica entre 0 e 1.
+- Pares bons tendem a score alto.
+- Pares ruins tendem a score baixo.
+- Testes unitários cobrem cenários simples.
+
+---
+
+## JW-054 — Tela mobile de revisão de alinhamento
+
+### Estória
+
+Como usuário, quero revisar pares alinhados no celular para aprovar, rejeitar ou marcar como suspeito.
+
+### Regras de UX
+
+- Card com texto EN e PT empilhados.
+- Mostrar score, tipo e flags.
+- Botões grandes: aprovar, rejeitar, editar, próximo.
+- Filtro por `suspeitos`, `score baixo`, `tipo`, `capítulo`.
+- Não usar tabela larga.
+
+### Critérios de aceite
+
+- Revisão é confortável no celular.
+- Usuário consegue aprovar/rejeitar rapidamente.
+- Pares suspeitos são fáceis de encontrar.
+
+---
+
+# Épico 6 — Segmentação e alinhamento de sentenças
+
+## JW-060 — Segmentar parágrafos aprovados em sentenças
+
+### Estória
+
+Como sistema, quero quebrar pares de parágrafos aprovados em sentenças para gerar pares menores e melhores para RAG/tradução.
+
+### Regras de negócio
+
+- Cada sentença mantém referência ao parágrafo.
+- Ordem é preservada.
+- Pontuação é preservada.
+- Abreviações comuns não devem quebrar de forma grosseira, quando possível.
+
+### Critérios de aceite
+
+- Sentenças são salvas.
+- Casos simples funcionam.
+- Erros ficam rastreáveis.
+
+---
+
+## JW-061 — Alinhar sentenças dentro de pares aprovados
+
+### Estória
+
+Como sistema, quero alinhar sentenças dentro de um par de parágrafos para criar memória mais precisa.
+
+### Regras de negócio
+
+- Alinhamento ocorre dentro do parágrafo já aprovado.
+- Permitir 1→1, 1→2, 2→1 e skip.
+- Score próprio de sentença.
+- Resultado não substitui automaticamente o parágrafo; complementa.
+
+### Critérios de aceite
+
+- Sentenças alinhadas são persistidas.
+- Pares suspeitos são marcados.
+- Tela permite revisar depois.
+
+---
+
+# Épico 7 — Validação e qualidade
+
+## JW-070 — Flags de qualidade
+
+### Estória
+
+Como sistema, quero marcar problemas prováveis nos pares alinhados para priorizar revisão humana.
+
+### Flags iniciais
+
+- `LOW_SCORE`
+- `LENGTH_DIVERGENCE`
+- `VERY_SHORT_SOURCE`
+- `VERY_SHORT_TARGET`
+- `POSSIBLE_MISSING_TEXT`
+- `POSSIBLE_EXTRA_TEXT`
+- `NUMBER_MISMATCH`
+- `QUOTE_MISMATCH`
+- `PLACEHOLDER_MISMATCH`
+
+### Critérios de aceite
+
+- Flags são geradas automaticamente.
+- Filtros podem usar flags.
+- Flags aparecem na UI.
+
+---
+
+## JW-071 — Relatório de qualidade da run
+
+### Estória
+
+Como usuário, quero ver um resumo da qualidade de uma execução de alinhamento.
+
+### Métricas
+
+- total de pares;
+- aprovados;
+- suspeitos;
+- rejeitados;
+- score médio;
+- quantidade por tipo;
+- capítulos com mais problemas;
+- skips.
+
+### Critérios de aceite
+
+- Relatório é gerado por run.
+- UI mobile mostra resumo em cards.
+
+---
+
+# Épico 8 — Memória canônica/RAG
+
+## JW-080 — Aprovar par para memória canônica
+
+### Estória
+
+Como usuário, quero aprovar pares bons para consolidar uma memória bilíngue confiável.
+
+### Regras de negócio
+
+- Pares aprovados entram em `memory_pair`.
+- Deve preservar origem e provenance.
+- Não duplicar par idêntico.
+- Aceitar nível `PARAGRAPH` e `SENTENCE`.
+
+### Critérios de aceite
+
+- Aprovação cria memória.
+- Duplicata é evitada.
+- Origem do par continua rastreável.
+
+---
+
+## JW-081 — Busca textual na memória
+
+### Estória
+
+Como usuário, quero buscar exemplos na memória por texto para revisar traduções e termos.
+
+### Critérios de aceite
+
+- Busca em EN e PT.
+- Retorna pares relevantes.
+- UI mobile exibe cards de memória.
+
+---
+
+## JW-082 — Embeddings e busca semântica
+
+### Estória
+
+Como sistema, quero gerar embeddings de pares aprovados para recuperar exemplos semanticamente semelhantes.
+
+### Regras de negócio
+
+- Registrar modelo usado.
+- Registrar dimensão.
+- Permitir embeddings de origem, destino e par combinado.
+- Busca deve retornar score.
+
+### Critérios de aceite
+
+- Embeddings são gerados.
+- Busca semântica funciona.
+- Resultados aparecem na UI.
+
+---
+
+# Épico 9 — Tradução assistida
+
+## JW-090 — Criar TranslationRun
+
+### Estória
+
+Como usuário, quero iniciar uma execução de tradução assistida para um trecho/capítulo usando memória e IA local.
+
+### Regras de negócio
+
+- TranslationRun deve registrar modelo, parâmetros, trecho de origem e contexto usado.
+- Não sobrescrever tradução humana automaticamente.
+- Toda saída da IA deve ser revisável.
+
+### Critérios de aceite
+
+- Run é criada.
+- Prompt/contexto são registrados.
+- Resultado é consultável.
+
+---
+
+## JW-091 — Montar contexto RAG para tradução
+
+### Estória
+
+Como sistema, quero recuperar exemplos da memória para ajudar o modelo local a traduzir com consistência.
+
+### Regras de negócio
+
+- Buscar exemplos semelhantes.
+- Incluir glossário quando existir.
+- Limitar tamanho do contexto.
+- Registrar quais memórias foram usadas.
+
+### Critérios de aceite
+
+- Contexto é gerado.
+- Memórias usadas são rastreáveis.
+- Usuário consegue ver o que influenciou a tradução.
+
+---
+
+## JW-092 — Tela mobile de tradução/revisão
+
+### Estória
+
+Como usuário, quero revisar tradução no celular, comparando original, sugestão da IA e memórias recuperadas.
+
+### UX mobile
+
+- Original em card.
+- Tradução sugerida em card editável.
+- Memórias recuperadas em acordeão.
+- Botões: aprovar, editar, rejeitar, próxima.
+
+### Critérios de aceite
+
+- Fluxo de revisão funciona no celular.
+- Tradução aprovada pode virar memória.
+
+---
+
+# Épico 10 — Frontend mobile-first desde cedo
+
+## JW-100 — Criar app React mobile-first
+
+### Estória
+
+Como usuário, quero acessar o Jarvis pelo celular com uma interface simples e funcional.
 
 ### Páginas iniciais
 
-* Dashboard
-* Jobs
-* Documents
-* Memory
-* AI Test
+- Home/Dashboard
+- Jobs
+- EPUBs
+- BookPairs
+- Alignment Runs
+- Memory
 
 ### Critérios de aceite
 
-* Aplicação sobe localmente.
-* Dashboard mostra status da API.
-* Navegação funciona.
+- App funciona em largura mobile.
+- Navegação simples.
+- Consome health check.
+- Layout não depende de tabela desktop.
 
 ---
 
-## JW-071 — Tela de listagem de jobs
+## JW-101 — Componente padrão de card de status
 
 ### Estória
 
-Como usuário, quero visualizar os jobs em uma tabela para acompanhar os processamentos.
-
-### Regras de negócio
-
-* Deve mostrar status, tipo, progresso e data.
-* Deve ter filtros básicos.
-* Deve ter paginação.
-* Status deve ser visualmente fácil de identificar.
+Como usuário mobile, quero visualizar status de jobs, EPUBs e runs em cards consistentes.
 
 ### Critérios de aceite
 
-* Lista jobs do backend.
-* Filtra por status.
-* Paginação funciona.
-* Ao clicar em um job, abre detalhe.
+- Card reutilizável.
+- Mostra título, subtítulo, status, progresso e ações.
+- Funciona bem no celular.
 
 ---
 
-## JW-072 — Tela de detalhe do job
+## JW-102 — Design system mínimo do Jarvis
 
 ### Estória
 
-Como usuário, quero ver os detalhes de um job para entender o que aconteceu durante o processamento.
+Como desenvolvedor, quero criar padrões mínimos de UI para não cada tela nascer de um jeito.
 
-### Regras de negócio
+### Itens
 
-* Mostrar status atual.
-* Mostrar progresso.
-* Mostrar mensagem.
-* Mostrar erro, se houver.
-* Atualizar dados manualmente com botão de refresh.
+- botões;
+- cards;
+- badges de status;
+- layout de página;
+- loading;
+- empty state;
+- error state.
 
 ### Critérios de aceite
 
-* Detalhe carrega por ID.
-* Job inexistente mostra erro amigável.
-* Erro do backend aparece de forma compreensível.
+- Componentes básicos criados.
+- Telas usam o mesmo padrão.
 
 ---
 
-# Épico 8 — Qualidade, documentação e empregabilidade
+# Ordem recomendada revisada
+
+## Sprint 0 — Base
+
+1. JW-001 — Health check e base Spring Boot. **DONE**
+2. JW-002 — PostgreSQL e Flyway.
+3. JW-003 — Erro padronizado.
+
+## Sprint 1 — Job engine
+
+1. JW-010 — Entity JobExecution.
+2. JW-011 — Criar/consultar/listar jobs.
+3. JW-012 — Ciclo de vida de jobs.
+4. JW-013 — Log de eventos do job.
+
+## Sprint 2 — EPUB real
+
+1. JW-020 — Upload de EPUB individual.
+2. JW-021 — Extrair estrutura básica.
+3. JW-022 — Extrair capítulos.
+4. JW-023 — Extrair parágrafos.
+5. JW-024 — Tela mobile de EPUB importado.
+
+## Sprint 3 — BookPair
+
+1. JW-030 — Criar BookPair EN/PT.
+2. JW-031 — Dashboard mobile do BookPair.
+
+## Sprint 4 — Capítulos
+
+1. JW-040 — Mapa baseline por índice.
+2. JW-041 — Mapa por embeddings/window.
+3. JW-042 — Tela mobile de revisão.
+
+## Sprint 5 — Alinhamento de parágrafos
+
+1. JW-050 — AlignmentRun.
+2. JW-051 — Baseline por índice.
+3. JW-052 — Window alignment real.
+4. JW-053 — Score composto.
+5. JW-054 — Tela mobile de revisão.
+
+## Sprint 6 — Sentenças
+
+1. JW-060 — Segmentar sentenças.
+2. JW-061 — Alinhar sentenças.
+
+## Sprint 7 — Qualidade
+
+1. JW-070 — Flags.
+2. JW-071 — Relatório da run.
+
+## Sprint 8 — Memória
+
+1. JW-080 — Aprovar memória.
+2. JW-081 — Busca textual.
+3. JW-082 — Busca semântica.
+
+## Sprint 9 — Tradução
+
+1. JW-090 — TranslationRun.
+2. JW-091 — Contexto RAG.
+3. JW-092 — Tela mobile de tradução.
+
+## Sprint 10 — Frontend consolidado
+
+1. JW-100 — App React mobile-first.
+2. JW-101 — Card de status.
+3. JW-102 — Design system mínimo.
+
+---
+
+# Como vamos trabalhar daqui para frente
+
+## Você implementa na mão
+
+Eu não vou assumir que você quer código pronto. O padrão será:
+
+1. Eu detalho a estória.
+2. Você implementa.
+3. Você cola dúvidas ou arquivos.
+4. Eu faço code review como LT/arquiteto.
+5. Só avançamos quando estiver bom.
+
+## Quando pedir detalhamento
+
+Use:
+
+```text
+Chefe, vamos detalhar a JW-002 antes de codar.
+Me diga arquivos, dependências, decisões, regras e critérios de aceite.
+```
+
+## Quando pedir review
+
+Use:
+
+```text
+Chefe, faz code review da JW-002.
+Arquivos alterados:
+...
+```
+
+---
+
+# Decisão importante
+
+O Jarvis não será tratado como projeto paralelo bagunçado.
+
+Ele será tratado como produto técnico real:
+
+- backend forte;
+- frontend mobile-first;
+- importação EPUB real;
+- alinhamento bilíngue real;
+- IA local como diferencial;
+- código limpo;
+- documentação;
+- testes;
+- portfólio.
+
+A meta é simples:
+
+> Recriar o Jarvis que você já construiu, só que mais organizado, mais bonito, mais revisável, mais mobile e mais profissional.
+
+# Backlog React Native — Jarvis Mobile
 
 ## Objetivo
 
-Transformar o projeto em algo apresentável para recrutador, entrevista e GitHub.
+Criar um aplicativo mobile para o **Jarvis Workbench**, feito em React Native, com foco em aprendizado real de mobile e uso prático no celular.
+
+Este backlog existe porque o Jarvis precisa ser confortável no celular desde cedo. A prioridade não é fazer uma tela bonita de desktop. A prioridade é criar uma experiência mobile para:
+
+1. acompanhar jobs longos;
+2. importar e visualizar EPUBs;
+3. revisar capítulos;
+4. revisar alinhamentos EN/PT;
+5. aprovar/rejeitar pares;
+6. consultar memória;
+7. futuramente revisar traduções.
 
 ---
 
-## JW-080 — Criar README profissional
+# Decisão de stack mobile
+
+## Stack recomendada
+
+* React Native
+* Expo
+* TypeScript
+* Expo Router
+* TanStack Query
+* React Hook Form
+* Zod
+* NativeWind ou StyleSheet puro no início
+* SecureStore em fase posterior
+* AsyncStorage em fase posterior
+
+## Por que Expo
+
+Para seu momento, Expo é o melhor caminho porque reduz dor de cabeça inicial com build nativo. Você aprende React Native, navegação, telas, chamadas HTTP, estado, formulários e UX mobile sem começar brigando com Gradle, Android Studio e configuração nativa.
+
+## Regra importante
+
+O app mobile não deve ter regra de negócio pesada. Ele deve consumir a API Java.
+
+Regra de ouro:
+
+```text
+Backend Java decide.
+Mobile mostra, coleta ação do usuário e envia comandos.
+```
+
+---
+
+# Princípios de UI mobile do Jarvis
+
+## 1. Card antes de tabela
+
+No celular, evitar tabelas grandes. Usar cards empilhados.
+
+## 2. Ação grande e clara
+
+Botões grandes para:
+
+* abrir;
+* iniciar job;
+* aprovar;
+* rejeitar;
+* revisar;
+* tentar novamente.
+
+## 3. Feedback sempre visível
+
+Jobs longos precisam mostrar:
+
+* status;
+* progresso;
+* mensagem atual;
+* erro, se existir;
+* última atualização.
+
+## 4. Leitura confortável
+
+Para revisão EN/PT:
+
+* texto original em um card;
+* texto traduzido/alinhado em outro;
+* score e flags visíveis;
+* navegação próxima/anterior fácil.
+
+## 5. Offline depois, não agora
+
+No início, o app pode depender da API local. Offline e cache avançado entram depois.
+
+---
+
+# Estrutura sugerida do projeto mobile
+
+```text
+jarvis-mobile/
+
+  app/
+    _layout.tsx
+    index.tsx
+    jobs/
+      index.tsx
+      [id].tsx
+    epubs/
+      index.tsx
+      [id].tsx
+    book-pairs/
+      index.tsx
+      [id].tsx
+    alignments/
+      index.tsx
+      [id].tsx
+      review.tsx
+    memory/
+      index.tsx
+    settings/
+      index.tsx
+
+  src/
+    api/
+      httpClient.ts
+      healthApi.ts
+      jobsApi.ts
+      epubsApi.ts
+      bookPairsApi.ts
+      alignmentsApi.ts
+      memoryApi.ts
+
+    components/
+      AppButton.tsx
+      AppCard.tsx
+      AppScreen.tsx
+      AppTextInput.tsx
+      StatusBadge.tsx
+      ProgressBar.tsx
+      EmptyState.tsx
+      ErrorState.tsx
+      LoadingState.tsx
+
+    features/
+      jobs/
+        components/
+        hooks/
+        types.ts
+      epubs/
+        components/
+        hooks/
+        types.ts
+      bookPairs/
+        components/
+        hooks/
+        types.ts
+      alignments/
+        components/
+        hooks/
+        types.ts
+      memory/
+        components/
+        hooks/
+        types.ts
+
+    theme/
+      spacing.ts
+      colors.ts
+      typography.ts
+      radius.ts
+
+    config/
+      env.ts
+```
+
+---
+
+# Épico RN-0 — Fundação mobile
+
+## RN-001 — Criar projeto Expo com TypeScript
 
 ### Estória
 
-Como visitante do GitHub, quero entender rapidamente o que o projeto faz, como rodar e quais tecnologias usa.
+Como desenvolvedor, quero criar o projeto mobile em Expo com TypeScript para iniciar o app Jarvis Mobile com uma base moderna e simples de evoluir.
 
-### README deve conter
+### Regras de negócio
 
-* Nome do projeto.
-* Descrição.
-* Problema que resolve.
-* Arquitetura.
-* Stack.
-* Como rodar backend.
-* Como rodar frontend.
-* Como configurar banco.
-* Exemplos de endpoints.
-* Prints ou GIFs, quando houver.
-* Roadmap.
+* O app deve iniciar no celular/emulador.
+* O projeto deve usar TypeScript.
+* O app deve ter nome claro: `Jarvis Mobile`.
+* Não deve consumir API ainda.
 
 ### Critérios de aceite
 
-* Uma pessoa consegue rodar o projeto seguindo o README.
-* O README explica por que o projeto é relevante.
-* Tem exemplos de request/response.
+* Projeto inicia com `npm start` ou comando equivalente.
+* App abre no Expo Go ou emulador.
+* Tela inicial mostra o nome `Jarvis Mobile`.
+* Estrutura inicial de pastas criada.
+
+### O que quero aprender nesta estória
+
+* O que é Expo.
+* Diferença entre React web e React Native.
+* Componentes básicos: `View`, `Text`, `Pressable`, `ScrollView`.
+* Como o app roda no celular.
+
+### O que quero ver no code review
+
+* Estrutura simples.
+* Sem libs desnecessárias.
+* TypeScript funcionando.
+* Código legível.
 
 ---
 
-## JW-081 — Criar coleção Postman ou arquivo HTTP
+## RN-002 — Criar layout base mobile
 
 ### Estória
 
-Como desenvolvedor ou avaliador técnico, quero testar a API facilmente sem precisar montar requests do zero.
+Como usuário, quero uma tela base consistente para navegar no Jarvis Mobile sem cada página parecer de um jeito.
+
+### Regras de UX
+
+* Toda tela deve ter padding seguro.
+* Deve respeitar área segura do celular.
+* Deve ter título visível.
+* Deve funcionar bem em telas pequenas.
+
+### Componentes esperados
+
+* `AppScreen`
+* `AppCard`
+* `AppButton`
+* `StatusBadge`
 
 ### Critérios de aceite
 
-* Existe coleção Postman ou arquivo `.http`.
-* Inclui health, jobs, documents, segmentation e AI test.
-* Variáveis de ambiente estão documentadas.
+* Tela inicial usa `AppScreen`.
+* Existe card reutilizável.
+* Existe botão reutilizável.
+* Layout fica confortável no celular.
+
+### O que quero aprender
+
+* Safe area.
+* Estilização no React Native.
+* Componentização mobile.
+* Diferença entre `Pressable`, `TouchableOpacity` e botão web.
 
 ---
 
-## JW-082 — Criar testes principais de integração
+## RN-003 — Configurar navegação com Expo Router
 
 ### Estória
 
-Como desenvolvedor, quero garantir que os principais fluxos funcionam de ponta a ponta.
+Como usuário, quero navegar entre as áreas principais do app para acessar Dashboard, Jobs, EPUBs, BookPairs, Alinhamentos, Memória e Configurações.
 
-### Fluxos mínimos
+### Rotas iniciais
 
-* Criar job.
-* Consultar job.
-* Upload de documento.
-* Segmentar documento.
-* Listar parágrafos.
-* Criar par bilíngue.
-* Aprovar memória.
+* `/`
+* `/jobs`
+* `/epubs`
+* `/book-pairs`
+* `/alignments`
+* `/memory`
+* `/settings`
+
+### Regras de negócio
+
+* Navegação deve ser simples.
+* O usuário deve conseguir voltar.
+* O app deve ter menu inferior ou lista de atalhos inicial.
 
 ### Critérios de aceite
 
-* Testes rodam localmente.
-* Testes não dependem de banco manual externo.
-* Pipeline básico documentado.
+* Todas as rotas abrem.
+* Tela inicial tem atalhos para as áreas principais.
+* Navegação funciona no celular.
+
+### O que quero aprender
+
+* Roteamento mobile.
+* Stack navigation.
+* Tabs ou links.
+* Organização por arquivos no Expo Router.
 
 ---
+
+## RN-004 — Configurar tema visual mínimo
+
+### Estória
+
+Como desenvolvedor, quero criar um tema mínimo para manter espaçamentos, tamanhos e cores consistentes no app.
+
+### Itens do tema
+
+* espaçamentos;
+* bordas;
+* tamanhos de fonte;
+* cores de status;
+* sombras simples.
+
+### Critérios de aceite
+
+* Componentes usam tema centralizado.
+* Status diferentes têm aparência consistente.
+* Não existem números mágicos espalhados demais.
+
+### O que quero aprender
+
+* Design tokens.
+* Como evitar UI bagunçada.
+* Como pensar visualmente no celular.
+
+---
+
+# Épico RN-1 — Conexão com API Java
+
+## RN-010 — Configurar API base local
+
+### Estória
+
+Como app mobile, quero saber a URL da API Java para consumir os endpoints do Jarvis Workbench.
+
+### Regras de negócio
+
+* A URL da API deve ficar centralizada.
+* Deve ser fácil trocar entre IP local, localhost/emulador e produção futura.
+* Erros de conexão devem ser tratados.
+
+### Arquivos esperados
+
+```text
+src/config/env.ts
+src/api/httpClient.ts
+```
+
+### Critérios de aceite
+
+* URL da API está centralizada.
+* Existe client HTTP reutilizável.
+* Erro de rede retorna mensagem amigável.
+
+### O que quero aprender
+
+* Diferença entre localhost no PC e no celular.
+* Chamada HTTP no React Native.
+* Organização de client API.
+
+---
+
+## RN-011 — Consumir Health Check
+
+### Estória
+
+Como usuário, quero ver se o backend Jarvis está online pelo app mobile.
+
+### Endpoint backend
+
+```http
+GET /api/health
+```
+
+### Regras de negócio
+
+* Dashboard deve mostrar status da API.
+* Se a API estiver fora, mostrar erro amigável.
+* Deve existir botão de tentar novamente.
+
+### Critérios de aceite
+
+* App chama `/api/health`.
+* Mostra `UP` quando backend responde.
+* Mostra erro quando backend está offline.
+* Botão retry funciona.
+
+### O que quero aprender
+
+* `fetch` ou client HTTP.
+* Loading state.
+* Error state.
+* Retry manual.
+
+---
+
+## RN-012 — Introduzir TanStack Query
+
+### Estória
+
+Como desenvolvedor, quero usar TanStack Query para controlar loading, erro, cache e refetch das chamadas HTTP.
+
+### Regras de negócio
+
+* Health check deve usar query.
+* Jobs futuros devem usar query.
+* Não espalhar `useEffect` para toda chamada de API.
+
+### Critérios de aceite
+
+* Provider configurado.
+* Health check usa `useQuery`.
+* Loading e erro continuam funcionando.
+
+### O que quero aprender
+
+* Cache de dados.
+* `useQuery`.
+* Refetch.
+* Separação entre API e tela.
+
+---
+
+# Épico RN-2 — Jobs mobile
+
+## RN-020 — Tela mobile de listagem de jobs
+
+### Estória
+
+Como usuário, quero ver os jobs do Jarvis em cards para acompanhar importações e alinhamentos pelo celular.
+
+### Endpoint esperado
+
+```http
+GET /api/jobs?page=0&size=20
+```
+
+### Regras de UX
+
+* Não usar tabela.
+* Cada job deve aparecer como card.
+* Mostrar tipo, status, progresso e mensagem.
+* Cards devem ser tocáveis.
+
+### Critérios de aceite
+
+* Lista jobs vindos da API.
+* Mostra loading.
+* Mostra erro.
+* Mostra empty state.
+* Ao tocar no card, abre detalhe.
+
+### O que quero aprender
+
+* FlatList.
+* Cards clicáveis.
+* Paginação simples.
+* Estados de tela.
+
+---
+
+## RN-021 — Tela de detalhe do job
+
+### Estória
+
+Como usuário, quero abrir um job e ver progresso, status, mensagem e erro para entender o que está acontecendo.
+
+### Endpoint esperado
+
+```http
+GET /api/jobs/{publicId}
+```
+
+### Regras de UX
+
+* Mostrar progresso visual.
+* Mostrar timeline resumida quando existir.
+* Mostrar erro em destaque.
+* Botão para atualizar.
+
+### Critérios de aceite
+
+* Detalhe carrega pelo ID.
+* Erro 404 aparece de forma amigável.
+* Refresh manual funciona.
+
+### O que quero aprender
+
+* Rotas dinâmicas.
+* Parâmetros de rota.
+* Progress bar.
+* Tratamento de erro por status HTTP.
+
+---
+
+## RN-022 — Auto-refresh para job em execução
+
+### Estória
+
+Como usuário, quero que jobs em execução atualizem automaticamente para acompanhar progresso sem ficar apertando refresh.
+
+### Regras de negócio
+
+* Auto-refresh só para jobs `PENDING` ou `RUNNING`.
+* Jobs finalizados não devem continuar atualizando sem necessidade.
+* Intervalo inicial sugerido: 3 a 5 segundos.
+
+### Critérios de aceite
+
+* Job em execução atualiza sozinho.
+* Job concluído para de atualizar.
+* Não causa chamadas infinitas desnecessárias.
+
+### O que quero aprender
+
+* Refetch interval.
+* Evitar polling exagerado.
+* Condicionar comportamento pelo status.
+
+---
+
+## RN-023 — Timeline mobile de eventos do job
+
+### Estória
+
+Como usuário, quero ver os eventos de um job para entender o histórico da importação ou alinhamento.
+
+### Endpoint esperado
+
+```http
+GET /api/jobs/{publicId}/events
+```
+
+### Regras de UX
+
+* Eventos aparecem em lista vertical.
+* Nível `ERROR` deve se destacar.
+* Mensagens longas devem quebrar linha.
+* Detalhes técnicos podem ficar recolhidos.
+
+### Critérios de aceite
+
+* Lista eventos.
+* Loading/erro/empty state funcionam.
+* Eventos são ordenados corretamente.
+
+### O que quero aprender
+
+* Listas cronológicas.
+* UI de logs no mobile.
+* Conteúdo expansível.
+
+---
+
+# Épico RN-3 — EPUBs no celular
+
+## RN-030 — Tela de lista de EPUBs
+
+### Estória
+
+Como usuário, quero ver todos os EPUBs importados em cards para escolher qual abrir.
+
+### Endpoint esperado
+
+```http
+GET /api/epubs?page=0&size=20
+```
+
+### Informações no card
+
+* título ou nome do arquivo;
+* idioma;
+* status;
+* capítulos;
+* parágrafos;
+* data de importação.
+
+### Critérios de aceite
+
+* Lista EPUBs.
+* Cards são legíveis no celular.
+* Empty state orienta o usuário a importar um EPUB.
+
+### O que quero aprender
+
+* Modelagem de DTO no frontend.
+* Listas mobile.
+* Separação entre feature e componente.
+
+---
+
+## RN-031 — Upload de EPUB pelo celular
+
+### Estória
+
+Como usuário, quero selecionar um arquivo EPUB no celular e enviar para o backend.
+
+### Regras de negócio
+
+* Aceitar apenas arquivo `.epub`.
+* Mostrar nome do arquivo antes de enviar.
+* Mostrar progresso ou estado de envio.
+* Exibir erro amigável se falhar.
+* Ao sucesso, mostrar job criado.
+
+### Endpoint backend
+
+```http
+POST /api/epubs/upload
+```
+
+### Critérios de aceite
+
+* Usuário seleciona arquivo.
+* App envia multipart para API.
+* Upload válido cria job.
+* Upload inválido mostra erro.
+
+### O que quero aprender
+
+* Seleção de arquivos no mobile.
+* Multipart upload.
+* Permissões.
+* Diferença entre URI local e arquivo real.
+
+### Observação
+
+Esta estória é mais difícil que listagem. Se travar, podemos primeiro fazer upload pelo Insomnia e usar o mobile só para visualizar.
+
+---
+
+## RN-032 — Tela de detalhe do EPUB
+
+### Estória
+
+Como usuário, quero abrir um EPUB e ver metadados, capítulos e resumo de extração.
+
+### Endpoint esperado
+
+```http
+GET /api/epubs/{id}
+```
+
+### Regras de UX
+
+* Mostrar metadados no topo.
+* Mostrar contadores em cards.
+* Mostrar capítulos em lista recolhível.
+* Mostrar botão para iniciar/reprocessar extração quando permitido.
+
+### Critérios de aceite
+
+* Detalhe carrega pelo ID.
+* Capítulos aparecem em ordem.
+* Usuário consegue abrir preview de capítulo.
+
+---
+
+## RN-033 — Preview de capítulo e parágrafos
+
+### Estória
+
+Como usuário, quero abrir um capítulo e visualizar seus parágrafos para validar se a importação ficou boa.
+
+### Regras de UX
+
+* Parágrafos aparecem em cards pequenos.
+* Índice global e índice no capítulo devem aparecer.
+* Texto longo deve ser legível.
+* Deve ter paginação ou carregamento gradual.
+
+### Critérios de aceite
+
+* Lista parágrafos do capítulo.
+* Ordem correta.
+* Scroll confortável.
+
+### O que quero aprender
+
+* Exibição de texto longo.
+* Performance com listas.
+* Paginação mobile.
+
+---
+
+# Épico RN-4 — BookPair mobile
+
+## RN-040 — Lista de pares de livros
+
+### Estória
+
+Como usuário, quero ver os pares EN/PT criados para escolher um fluxo de alinhamento.
+
+### Endpoint esperado
+
+```http
+GET /api/book-pairs?page=0&size=20
+```
+
+### Informações no card
+
+* nome do par;
+* idioma origem e destino;
+* EPUB origem;
+* EPUB destino;
+* status;
+* último job;
+* próximo passo.
+
+### Critérios de aceite
+
+* Lista book pairs.
+* Card mostra estado geral.
+* Tocar abre dashboard do par.
+
+---
+
+## RN-041 — Criar BookPair pelo celular
+
+### Estória
+
+Como usuário, quero selecionar dois EPUBs importados e criar um par EN/PT pelo app mobile.
+
+### Regras de negócio
+
+* Usuário deve escolher EPUB origem.
+* Usuário deve escolher EPUB destino.
+* Não pode escolher o mesmo EPUB duas vezes.
+* Idiomas devem ser preenchidos.
+* Nome do par é obrigatório.
+
+### Critérios de aceite
+
+* Formulário valida dados.
+* Erros aparecem perto dos campos.
+* Envio cria BookPair.
+* Ao sucesso, navega para detalhe.
+
+### O que quero aprender
+
+* React Hook Form.
+* Zod.
+* Select/lista no mobile.
+* Validação de formulário.
+
+---
+
+## RN-042 — Dashboard mobile do BookPair
+
+### Estória
+
+Como usuário, quero ver o estado geral do par de livros para decidir o próximo passo.
+
+### Informações
+
+* quantidade de capítulos EN/PT;
+* quantidade de parágrafos EN/PT;
+* status do mapeamento de capítulos;
+* status do alinhamento;
+* últimos jobs;
+* ações recomendadas.
+
+### Critérios de aceite
+
+* Dashboard é legível no celular.
+* Ações principais são claras.
+* Usuário entende se já pode alinhar.
+
+---
+
+# Épico RN-5 — Mapeamento de capítulos mobile
+
+## RN-050 — Listar mapa de capítulos
+
+### Estória
+
+Como usuário, quero ver os capítulos EN/PT mapeados para revisar antes do alinhamento de parágrafos.
+
+### Regras de UX
+
+* Cada mapeamento aparece como card.
+* Mostrar capítulo EN e capítulo PT.
+* Mostrar score.
+* Mostrar flag de suspeito.
+* Mostrar status de revisão.
+
+### Critérios de aceite
+
+* Lista mapeamentos.
+* Cards são legíveis no celular.
+* Filtro por suspeitos funciona.
+
+---
+
+## RN-051 — Revisar par de capítulos
+
+### Estória
+
+Como usuário, quero abrir um mapeamento de capítulos e aprovar, rejeitar ou ajustar o par.
+
+### Regras de UX
+
+* Mostrar preview do texto EN.
+* Mostrar preview do texto PT.
+* Mostrar score e motivo das flags.
+* Botões grandes: aprovar, rejeitar, ajustar.
+
+### Critérios de aceite
+
+* Usuário aprova mapeamento.
+* Usuário rejeita mapeamento.
+* Status muda na API.
+
+---
+
+# Épico RN-6 — Revisão de alinhamento mobile
+
+## RN-060 — Lista de alignment runs
+
+### Estória
+
+Como usuário, quero ver as execuções de alinhamento de um BookPair para escolher qual revisar.
+
+### Informações no card
+
+* algoritmo;
+* status;
+* data;
+* total de pares;
+* score médio;
+* suspeitos;
+* aprovados.
+
+### Critérios de aceite
+
+* Lista runs.
+* Card mostra resumo útil.
+* Tocar abre detalhe.
+
+---
+
+## RN-061 — Resumo da alignment run
+
+### Estória
+
+Como usuário, quero ver um resumo de qualidade da run antes de revisar pares.
+
+### Métricas
+
+* total de pares;
+* score médio;
+* pares suspeitos;
+* skips;
+* tipos de alinhamento;
+* capítulos problemáticos.
+
+### Critérios de aceite
+
+* Resumo aparece em cards.
+* Usuário consegue ir para revisão.
+* Filtros iniciais estão disponíveis.
+
+---
+
+## RN-062 — Tela de revisão de pares alinhados
+
+### Estória
+
+Como usuário, quero revisar pares EN/PT no celular, um por vez ou em lista, para aprovar/rejeitar com conforto.
+
+### Regras de UX
+
+* Texto EN em card.
+* Texto PT em card.
+* Score visível.
+* Flags visíveis.
+* Tipo do alinhamento visível.
+* Botões grandes: aprovar, rejeitar, suspeito, próximo.
+* Deve ser confortável para leitura no celular.
+
+### Critérios de aceite
+
+* Carrega pares da run.
+* Aprova par.
+* Rejeita par.
+* Marca suspeito.
+* Navega próximo/anterior.
+
+### O que quero aprender
+
+* UX de revisão.
+* Estado local temporário.
+* Mutations com TanStack Query.
+* Atualização otimista ou refetch após ação.
+
+---
+
+## RN-063 — Filtros de revisão
+
+### Estória
+
+Como usuário, quero filtrar pares por score, flag, capítulo e tipo para revisar primeiro os problemáticos.
+
+### Filtros iniciais
+
+* score baixo;
+* suspeitos;
+* skip;
+* 1→2;
+* 2→1;
+* capítulo;
+* não revisados.
+
+### Critérios de aceite
+
+* Filtros alteram lista.
+* Filtro ativo aparece claramente.
+* É fácil limpar filtros.
+
+---
+
+## RN-064 — Edição manual de par alinhado
+
+### Estória
+
+Como usuário, quero editar manualmente o texto de um par alinhado antes de aprovar para memória.
+
+### Regras de negócio
+
+* Edição não deve apagar texto original sem rastreabilidade.
+* Deve salvar versão revisada.
+* Deve registrar que houve edição humana.
+
+### Critérios de aceite
+
+* Usuário edita EN/PT revisado.
+* Salva alteração.
+* API mantém original e revisado.
+
+### Observação
+
+Essa estória depende de suporte no backend.
+
+---
+
+# Épico RN-7 — Memória mobile
+
+## RN-070 — Busca textual na memória
+
+### Estória
+
+Como usuário, quero buscar exemplos aprovados na memória pelo celular.
+
+### Regras de UX
+
+* Campo de busca grande.
+* Resultados em cards.
+* Mostrar EN/PT.
+* Mostrar origem/provenance.
+
+### Critérios de aceite
+
+* Busca chama API.
+* Loading/erro/empty state funcionam.
+* Resultados são legíveis.
+
+---
+
+## RN-071 — Detalhe do par de memória
+
+### Estória
+
+Como usuário, quero abrir um par de memória e ver sua origem, nível, scores e texto completo.
+
+### Critérios de aceite
+
+* Detalhe mostra EN/PT completo.
+* Mostra se veio de parágrafo ou sentença.
+* Mostra livro/run de origem.
+
+---
+
+# Épico RN-8 — Tradução/revisão mobile
+
+## RN-080 — Tela de tradução assistida
+
+### Estória
+
+Como usuário, quero revisar uma sugestão de tradução no celular comparando original, IA e memórias recuperadas.
+
+### Regras de UX
+
+* Original no topo.
+* Tradução sugerida em campo editável.
+* Memórias em acordeão.
+* Botões grandes: aprovar, editar, rejeitar, próxima.
+
+### Critérios de aceite
+
+* Exibe tradução sugerida.
+* Exibe contexto usado.
+* Permite aprovar versão final.
+
+---
+
+## RN-081 — Histórico de traduções
+
+### Estória
+
+Como usuário, quero ver traduções anteriores para acompanhar o progresso do projeto.
+
+### Critérios de aceite
+
+* Lista TranslationRuns.
+* Mostra status e modelo usado.
+* Abre detalhe.
+
+---
+
+# Épico RN-9 — Configurações mobile
+
+## RN-090 — Configurar URL da API pelo app
+
+### Estória
+
+Como usuário, quero configurar a URL da API Java no app para conectar com meu backend local.
+
+### Regras de negócio
+
+* Campo deve aceitar IP/porta.
+* Deve ter botão testar conexão.
+* Deve salvar configuração localmente.
+
+### Critérios de aceite
+
+* Usuário altera URL.
+* Configuração é persistida.
+* Health check usa nova URL.
+
+### O que quero aprender
+
+* AsyncStorage ou SecureStore.
+* Configuração local.
+* Teste de conexão.
+
+---
+
+## RN-091 — Tela Sobre o Jarvis Mobile
+
+### Estória
+
+Como usuário, quero ver informações do app, versão e backend conectado.
+
+### Critérios de aceite
+
+* Mostra versão do app.
+* Mostra URL da API.
+* Mostra status do backend.
+
+---
+
+# Ordem recomendada de desenvolvimento mobile
+
+## Sprint Mobile 0 — Fundação
+
+1. RN-001 — Criar projeto Expo com TypeScript.
+2. RN-002 — Criar layout base mobile.
+3. RN-003 — Configurar navegação com Expo Router.
+4. RN-004 — Configurar tema visual mínimo.
+
+## Sprint Mobile 1 — API e health
+
+1. RN-010 — Configurar API base local.
+2. RN-011 — Consumir Health Check.
+3. RN-012 — Introduzir TanStack Query.
+
+## Sprint Mobile 2 — Jobs
+
+1. RN-020 — Tela mobile de listagem de jobs.
+2. RN-021 — Tela de detalhe do job.
+3. RN-022 — Auto-refresh para job em execução.
+4. RN-023 — Timeline mobile de eventos do job.
+
+## Sprint Mobile 3 — EPUBs
+
+1. RN-030 — Tela de lista de EPUBs.
+2. RN-032 — Tela de detalhe do EPUB.
+3. RN-033 — Preview de capítulo e parágrafos.
+4. RN-031 — Upload de EPUB pelo celular.
+
+Observação: upload pode ser feito depois de listagem/detalhe porque é mais difícil.
+
+## Sprint Mobile 4 — BookPair
+
+1. RN-040 — Lista de pares de livros.
+2. RN-041 — Criar BookPair pelo celular.
+3. RN-042 — Dashboard mobile do BookPair.
+
+## Sprint Mobile 5 — Capítulos
+
+1. RN-050 — Listar mapa de capítulos.
+2. RN-051 — Revisar par de capítulos.
+
+## Sprint Mobile 6 — Alinhamento
+
+1. RN-060 — Lista de alignment runs.
+2. RN-061 — Resumo da alignment run.
+3. RN-062 — Tela de revisão de pares alinhados.
+4. RN-063 — Filtros de revisão.
+5. RN-064 — Edição manual de par alinhado.
+
+## Sprint Mobile 7 — Memória
+
+1. RN-070 — Busca textual na memória.
+2. RN-071 — Detalhe do par de memória.
+
+## Sprint Mobile 8 — Tradução
+
+1. RN-080 — Tela de tradução assistida.
+2. RN-081 — Histórico de traduções.
+
+## Sprint Mobile 9 — Configurações
+
+1. RN-090 — Configurar URL da API pelo app.
+2. RN-091 — Tela Sobre o Jarvis Mobile.
+
+---
+
+# Como pedir ajuda no mobile
+
+## Para detalhar uma estória
+
+```text
+Chefe, vamos detalhar a RN-001 antes de codar.
+Me diga exatamente arquivos, dependências, decisões, regras e critérios de aceite.
+```
+
+## Para code review
+
+```text
+Chefe, faz code review da RN-001.
+Arquivos alterados:
+...
+```
+
+## Para dúvida conceitual
+
+```text
+Chefe, estou na RN-002 e não entendi a diferença entre View, ScrollView e SafeAreaView.
+Me explica como LT/professor.
+```
+
+## Para erro
+
+```text
+Chefe, estou na RN-011 e deu esse erro no celular:
+[erro]
+Meu env.ts está assim:
+...
+Meu httpClient está assim:
+...
+```
+
+---
+
+# Decisão final
+
+O Jarvis terá dois clientes possíveis no futuro:
+
+1. **Jarvis Mobile**, em React Native, prioridade para seu uso no celular.
+2. **Jarvis Web**, em React, possível fase posterior.
+
+A prioridade agora, depois da base backend, será aprender mobile de verdade, porque é onde você sente mais necessidade prática.
+
+O mobile não é enfeite. Ele será parte real do produto Jarvis.
