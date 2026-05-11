@@ -54,3 +54,36 @@ SQL inicial:
 ```sql
 CREATE DATABASE jarvis_workbench;
 ```
+
+## Padrão de erros da API
+
+Todas as respostas de erro seguem o formato:
+
+```json
+{
+  "timestamp": "2026-05-10T12:00:00",
+  "status": 400,
+  "error": "VALIDATION_ERROR",
+  "message": "Invalid request data",
+  "path": "/api/example",
+  "fields": [
+    {
+      "name": "sourceLang",
+      "message": "must not be blank"
+    }
+  ]
+}
+```
+
+Quando não houver erro de campo, `fields` será retornado como lista vazia:
+
+```json
+{
+  "timestamp": "2026-05-10T12:00:00",
+  "status": 404,
+  "error": "RESOURCE_NOT_FOUND",
+  "message": "Resource not found",
+  "path": "/api/example/123",
+  "fields": []
+}
+```
