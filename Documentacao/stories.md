@@ -306,6 +306,7 @@ src/main/resources/db/migration/V1__init_schema.sql
 ---
 
 ## JW-003 — Erro padronizado da API
+JW-003 — DONE
 
 ### Estória
 
