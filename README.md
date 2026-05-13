@@ -33,6 +33,94 @@ Resposta esperada:
   "service": "jarvis-workbench-api"
 }
 ```
+
+### Create Job
+```
+curl --request POST \
+  --url http://localhost:8088/api/jobs \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "type": "EPUB_IMPORT",
+  "metadataJson": "{\"source\":\"manual-test\"}"
+}'
+```
+Resposta esperada:
+
+```json
+{
+  "id": "job_23562c6a89b94625a5063438026aa2b5",
+  "type": "EPUB_IMPORT",
+  "status": "PENDING",
+  "progress": 0,
+  "currentStep": null,
+  "totalSteps": null,
+  "message": null,
+  "metadataJson": "{\"source\":\"manual-test\"}",
+  "createdAt": "2026-05-12T13:26:37.2508208",
+  "startedAt": null,
+  "finishedAt": null,
+  "updatedAt": "2026-05-12T13:26:37.2508208",
+  "errorCode": null,
+  "errorMessage": null
+}
+```
+### Get Jobs by Public Id
+```
+curl --request GET \
+  --url http://localhost:8088/api/jobs/job_23562c6a89b94625a5063438026aa2b5
+```
+Resposta esperada:
+
+```json
+{
+  "id": "job_23562c6a89b94625a5063438026aa2b5",
+  "type": "EPUB_IMPORT",
+  "status": "PENDING",
+  "progress": 0,
+  "currentStep": null,
+  "totalSteps": null,
+  "message": null,
+  "metadataJson": "{\"source\":\"manual-test\"}",
+  "createdAt": "2026-05-12T13:26:37.250821",
+  "startedAt": null,
+  "finishedAt": null,
+  "updatedAt": "2026-05-12T13:26:37.250821",
+  "errorCode": null,
+  "errorMessage": null
+}
+```
+### Get All Jobs (paginated)
+```
+curl --request GET \
+  --url 'http://localhost:8088/api/jobs?status=PENDING&type=EPUB_IMPORT'
+```
+Resposta esperada
+```json
+{
+  "items": [
+    {
+      "id": "job_23562c6a89b94625a5063438026aa2b5",
+      "type": "EPUB_IMPORT",
+      "status": "PENDING",
+      "progress": 0,
+      "currentStep": null,
+      "totalSteps": null,
+      "message": null,
+      "metadataJson": "{\"source\":\"manual-test\"}",
+      "createdAt": "2026-05-12T13:26:37.250821",
+      "startedAt": null,
+      "finishedAt": null,
+      "updatedAt": "2026-05-12T13:26:37.250821",
+      "errorCode": null,
+      "errorMessage": null
+    }
+  ],
+  "page": 0,
+  "size": 20,
+  "totalElements": 1,
+  "totalPages": 1
+}
+```
 ## Banco de dados local
 
 O projeto usa PostgreSQL.

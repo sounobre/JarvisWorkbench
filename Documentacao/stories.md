@@ -349,7 +349,7 @@ Como usuário da API, quero receber erros padronizados para entender falhas de v
 # Épico 1 — Job engine real do Jarvis
 
 ## JW-010 — Criar entidade JobExecution
-
+JW-010 — DONE
 ### Estória
 
 Como sistema, quero registrar processamentos longos para acompanhar importação EPUB, segmentação, alinhamento e tradução.
@@ -403,7 +403,7 @@ Tabela: `job_execution`
 ---
 
 ## JW-011 — Criar, consultar e listar jobs
-
+JW-011 — DONE
 ### Estória
 
 Como usuário, quero criar e consultar jobs para acompanhar processos do Jarvis pelo celular.
