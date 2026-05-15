@@ -3,9 +3,7 @@ package com.dnobretech.jarvisworkbench.job.application;
 import com.dnobretech.jarvisworkbench.job.domain.JobExecution;
 import com.dnobretech.jarvisworkbench.job.domain.JobStatus;
 import com.dnobretech.jarvisworkbench.job.domain.JobType;
-import com.dnobretech.jarvisworkbench.job.dto.CreateJobRequest;
-import com.dnobretech.jarvisworkbench.job.dto.JobListResponse;
-import com.dnobretech.jarvisworkbench.job.dto.JobResponse;
+import com.dnobretech.jarvisworkbench.job.dto.*;
 import com.dnobretech.jarvisworkbench.job.repository.JobExecutionRepository;
 import com.dnobretech.jarvisworkbench.shared.error.BusinessException;
 import com.dnobretech.jarvisworkbench.shared.error.ResourceNotFoundException;
@@ -213,5 +211,180 @@ public class JobServiceTest {
                 .hasMessageContaining("size"); // Ajuste o texto para bater com a mensagem real do seu Service
 
         Mockito.verifyNoInteractions(jobExecutionRepository);
+    }
+
+    @Test
+    void shouldStartJob() {
+        JobExecution jobExecution = JobExecution.create(JobType.EPUB_IMPORT, "{}");
+        String publicId = jobExecution.getPublicId();
+
+        StartJobRequest request = new StartJobRequest(10, "Starting EPUB import");
+
+        Mockito.when(jobExecutionRepository.findByPublicId(publicId))
+                .thenReturn(Optional.of(jobExecution));
+
+        mockMapperToResponseFromEntity();
+
+        JobResponse response = jobService.startJob(publicId, request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.id()).isEqualTo(publicId);
+        assertThat(response.status()).isEqualTo(JobStatus.RUNNING);
+        assertThat(response.progress()).isEqualTo(0);
+        assertThat(response.currentStep()).isEqualTo(0);
+        assertThat(response.totalSteps()).isEqualTo(10);
+        assertThat(response.message()).isEqualTo("Starting EPUB import");
+        assertThat(response.startedAt()).isNotNull();
+
+        Mockito.verify(jobExecutionRepository).findByPublicId(publicId);
+        Mockito.verify(jobExecutionRepository).save(jobExecution);
+        Mockito.verify(jobMapper).toResponse(jobExecution);
+    }
+
+    @Test
+    void shouldUpdateProgress() {
+        JobExecution jobExecution = JobExecution.create(JobType.EPUB_IMPORT, "{}");
+        jobExecution.start(10, "Starting");
+
+        String publicId = jobExecution.getPublicId();
+
+        UpdateJobProgressRequest request = new UpdateJobProgressRequest(
+                35,
+                3,
+                10,
+                "Extracting chapters"
+        );
+
+        Mockito.when(jobExecutionRepository.findByPublicId(publicId))
+                .thenReturn(Optional.of(jobExecution));
+
+        mockMapperToResponseFromEntity();
+
+        JobResponse response = jobService.updateProgress(publicId, request);
+
+        assertThat(response.status()).isEqualTo(JobStatus.RUNNING);
+        assertThat(response.progress()).isEqualTo(35);
+        assertThat(response.currentStep()).isEqualTo(3);
+        assertThat(response.totalSteps()).isEqualTo(10);
+        assertThat(response.message()).isEqualTo("Extracting chapters");
+
+        Mockito.verify(jobExecutionRepository).save(jobExecution);
+        Mockito.verify(jobMapper).toResponse(jobExecution);
+    }
+
+    @Test
+    void shouldCompleteJob() {
+        JobExecution jobExecution = JobExecution.create(JobType.EPUB_IMPORT, "{}");
+        jobExecution.start(10, "Starting");
+
+        String publicId = jobExecution.getPublicId();
+
+        CompleteJobRequest request = new CompleteJobRequest("Job completed successfully");
+
+        Mockito.when(jobExecutionRepository.findByPublicId(publicId))
+                .thenReturn(Optional.of(jobExecution));
+
+        mockMapperToResponseFromEntity();
+
+        JobResponse response = jobService.completeJob(publicId, request);
+
+        assertThat(response.status()).isEqualTo(JobStatus.COMPLETED);
+        assertThat(response.progress()).isEqualTo(100);
+        assertThat(response.finishedAt()).isNotNull();
+        assertThat(response.message()).isEqualTo("Job completed successfully");
+
+        Mockito.verify(jobExecutionRepository).save(jobExecution);
+        Mockito.verify(jobMapper).toResponse(jobExecution);
+    }
+
+    @Test
+    void shouldFailJob() {
+        JobExecution jobExecution = JobExecution.create(JobType.EPUB_IMPORT, "{}");
+        jobExecution.start(10, "Starting");
+
+        String publicId = jobExecution.getPublicId();
+
+        FailJobRequest request = new FailJobRequest("EPUB_PARSE_ERROR","Unable to read EPUB spine");
+
+        Mockito.when(jobExecutionRepository.findByPublicId(publicId))
+                .thenReturn(Optional.of(jobExecution));
+
+        mockMapperToResponseFromEntity();
+
+        JobResponse response = jobService.failJob(publicId, request);
+
+        assertThat(response.status()).isEqualTo(JobStatus.FAILED);
+        assertThat(response.finishedAt()).isNotNull();
+        assertThat(response.errorCode()).isEqualTo("EPUB_PARSE_ERROR");
+        assertThat(response.errorMessage()).isEqualTo("Unable to read EPUB spine");
+
+        Mockito.verify(jobExecutionRepository).save(jobExecution);
+        Mockito.verify(jobMapper).toResponse(jobExecution);
+    }
+
+    @Test
+    void shouldCancelJob() {
+        JobExecution jobExecution = JobExecution.create(JobType.EPUB_IMPORT, "{}");
+        jobExecution.start(10, "Starting");
+
+        String publicId = jobExecution.getPublicId();
+
+        CancelJobRequest request = new CancelJobRequest("Cancelled by user");
+
+        Mockito.when(jobExecutionRepository.findByPublicId(publicId))
+                .thenReturn(Optional.of(jobExecution));
+
+        mockMapperToResponseFromEntity();
+
+        JobResponse response = jobService.cancelJob(publicId, request);
+
+        assertThat(response.status()).isEqualTo(JobStatus.CANCELLED);
+        assertThat(response.finishedAt()).isNotNull();
+        assertThat(response.message()).isEqualTo("Cancelled by user");
+
+        Mockito.verify(jobExecutionRepository).save(jobExecution);
+        Mockito.verify(jobMapper).toResponse(jobExecution);
+    }
+
+    @Test
+    void shouldThrowNotFoundWhenStartingMissingJob() {
+        String publicId = "job_missing";
+
+        StartJobRequest request = new StartJobRequest(10, "Starting");
+
+        Mockito.when(jobExecutionRepository.findByPublicId(publicId))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> jobService.startJob(publicId, request))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Job execution not found");
+
+        Mockito.verify(jobExecutionRepository).findByPublicId(publicId);
+        Mockito.verify(jobExecutionRepository, Mockito.never()).save(any());
+        Mockito.verifyNoInteractions(jobMapper);
+    }
+
+    private void mockMapperToResponseFromEntity() {
+        Mockito.when(jobMapper.toResponse(any(JobExecution.class)))
+                .thenAnswer(invocation -> {
+                    JobExecution currentJob = invocation.getArgument(0);
+
+                    return new JobResponse(
+                            currentJob.getPublicId(),
+                            currentJob.getType(),
+                            currentJob.getStatus(),
+                            currentJob.getProgress(),
+                            currentJob.getCurrentStep(),
+                            currentJob.getTotalSteps(),
+                            currentJob.getMessage(),
+                            currentJob.getMetadataJson(),
+                            currentJob.getCreatedAt(),
+                            currentJob.getStartedAt(),
+                            currentJob.getFinishedAt(),
+                            currentJob.getUpdatedAt(),
+                            currentJob.getErrorCode(),
+                            currentJob.getErrorMessage()
+                    );
+                });
     }
 }

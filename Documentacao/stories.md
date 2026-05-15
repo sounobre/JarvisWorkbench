@@ -433,7 +433,7 @@ GET /api/jobs?status=RUNNING&type=EPUB_IMPORT&page=0&size=20
 ---
 
 ## JW-012 — Ciclo de vida do job
-
+JW-012 — DONE
 ### Estória
 
 Como sistema, quero iniciar, atualizar progresso, concluir e falhar jobs com regras consistentes.

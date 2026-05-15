@@ -1,8 +1,10 @@
 package com.dnobretech.jarvisworkbench.job.domain;
 
+import com.dnobretech.jarvisworkbench.shared.error.BusinessException;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -64,15 +66,102 @@ public class JobExecution {
             throw new IllegalArgumentException("Job type is required");
         }
 
+        LocalDateTime now = LocalDateTime.now();
+
         JobExecution jobExecution = new JobExecution();
         jobExecution.publicId = "job_" + UUID.randomUUID().toString().replace("-", "");
         jobExecution.status = JobStatus.PENDING;
         jobExecution.type = type;
         jobExecution.metadataJson = metadataJson;
         jobExecution.progress = 0;
-        jobExecution.createdAt = LocalDateTime.now();
-        jobExecution.updatedAt = LocalDateTime.now();
+        jobExecution.createdAt = now;
+        jobExecution.updatedAt = now;
         return jobExecution;
+    }
+
+    public void start(Integer totalSteps, String message) {
+
+        if (this.status != JobStatus.PENDING) {
+            throw new BusinessException("Only pending jobs can be started");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        this.status = JobStatus.RUNNING;
+        this.startedAt = now;
+        this.updatedAt = now;
+        this.currentStep = 0;
+        this.totalSteps = totalSteps;
+        this.message = message;
+    }
+
+    public void updateProgress(Integer progress, Integer currentStep, Integer totalSteps, String message) {
+
+        if (this.status != JobStatus.RUNNING) {
+            throw new BusinessException("Only running jobs can be updated");
+        }
+
+        if (Objects.isNull(progress) || progress < 0 || progress > 100) {
+            throw new BusinessException("Progress must be between 0 and 100");
+        }
+
+        this.updatedAt = LocalDateTime.now();
+        this.progress = progress;
+        this.currentStep = currentStep;
+        this.totalSteps = totalSteps;
+        this.message = message;
+    }
+
+    public void complete(String message) {
+
+        if (this.status != JobStatus.RUNNING) {
+            throw new BusinessException("Only running jobs can be completed");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        this.progress = 100;
+        this.message = message;
+        this.status = JobStatus.COMPLETED;
+        this.finishedAt = now;
+        this.updatedAt = now;
+    }
+
+    public void fail(String errorCode, String errorMessage) {
+
+        if (this.status != JobStatus.RUNNING) {
+            throw new BusinessException("Only running jobs can be failed");
+        }
+
+        if (errorCode == null || errorCode.isBlank()) {
+            throw new BusinessException("Error code is required");
+        }
+
+        if (errorMessage == null || errorMessage.isBlank()) {
+            throw new BusinessException("Error message is required");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        this.errorCode = errorCode;
+        this.errorMessage = errorMessage;
+        this.status = JobStatus.FAILED;
+        this.finishedAt = now;
+        this.updatedAt = now;
+    }
+
+    public void cancel(String message) {
+
+        if (this.status != JobStatus.RUNNING) {
+            throw new BusinessException("Only running jobs can be cancelled");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        this.message = message;
+        this.status = JobStatus.CANCELLED;
+        this.finishedAt = now;
+        this.updatedAt = now;
     }
 
     protected JobExecution() {
@@ -90,56 +179,28 @@ public class JobExecution {
         return type;
     }
 
-    public void setType(JobType type) {
-        this.type = type;
-    }
-
     public JobStatus getStatus() {
         return status;
-    }
-
-    public void setStatus(JobStatus status) {
-        this.status = status;
     }
 
     public Integer getProgress() {
         return progress;
     }
 
-    public void setProgress(Integer progress) {
-        this.progress = progress;
-    }
-
     public Integer getCurrentStep() {
         return currentStep;
-    }
-
-    public void setCurrentStep(Integer currentStep) {
-        this.currentStep = currentStep;
     }
 
     public Integer getTotalSteps() {
         return totalSteps;
     }
 
-    public void setTotalSteps(Integer totalSteps) {
-        this.totalSteps = totalSteps;
-    }
-
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public String getMetadataJson() {
         return metadataJson;
-    }
-
-    public void setMetadataJson(String metadataJson) {
-        this.metadataJson = metadataJson;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -150,16 +211,8 @@ public class JobExecution {
         return startedAt;
     }
 
-    public void setStartedAt(LocalDateTime startedAt) {
-        this.startedAt = startedAt;
-    }
-
     public LocalDateTime getFinishedAt() {
         return finishedAt;
-    }
-
-    public void setFinishedAt(LocalDateTime finishedAt) {
-        this.finishedAt = finishedAt;
     }
 
     public LocalDateTime getUpdatedAt() {
@@ -170,15 +223,7 @@ public class JobExecution {
         return errorCode;
     }
 
-    public void setErrorCode(String errorCode) {
-        this.errorCode = errorCode;
-    }
-
     public String getErrorMessage() {
         return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
     }
 }
