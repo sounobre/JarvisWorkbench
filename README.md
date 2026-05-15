@@ -121,6 +121,151 @@ Resposta esperada
   "totalPages": 1
 }
 ```
+### Start Job
+```
+curl --request POST \
+  --url http://localhost:8088/api/jobs/job_d5204a1b9ac945959c4df2df55c22318/start \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "totalSteps": 10,
+  "message": "Starting EPUB import"
+}'
+```
+Resposta esperada
+```json
+{
+  "id": "job_d5204a1b9ac945959c4df2df55c22318",
+  "type": "EPUB_IMPORT",
+  "status": "RUNNING",
+  "progress": 0,
+  "currentStep": 0,
+  "totalSteps": 10,
+  "message": "Starting EPUB import",
+  "metadataJson": "{\"source\":\"manual-test\"}",
+  "createdAt": "2026-05-15T15:27:57.76384",
+  "startedAt": "2026-05-15T15:28:00.7264551",
+  "finishedAt": null,
+  "updatedAt": "2026-05-15T15:28:00.7264551",
+  "errorCode": null,
+  "errorMessage": null
+}
+```
+### Updated Job Progress
+```
+curl --request PATCH \
+  --url http://localhost:8088/api/jobs/job_3883c574f4e94a8783bab582a8c633a9/progress \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "progress": 35,
+  "currentStep": 3,
+  "totalSteps": 10,
+  "message": "Extracting chapters"
+}'
+```
+Resposta esperada
+```json
+{
+  "id": "job_3883c574f4e94a8783bab582a8c633a9",
+  "type": "EPUB_IMPORT",
+  "status": "RUNNING",
+  "progress": 35,
+  "currentStep": 3,
+  "totalSteps": 10,
+  "message": "Extracting chapters",
+  "metadataJson": "{\"source\":\"manual-test\"}",
+  "createdAt": "2026-05-15T18:16:34.603573",
+  "startedAt": "2026-05-15T18:16:38.868631",
+  "finishedAt": null,
+  "updatedAt": "2026-05-15T18:16:50.3612025",
+  "errorCode": null,
+  "errorMessage": null
+}
+```
+### Completd Job
+```
+curl --request POST \
+  --url http://localhost:8088/api/jobs/job_3883c574f4e94a8783bab582a8c633a9/complete \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "message": "Job completed successfully"
+}'
+```
+Resposta esperada
+```json
+{
+  "id": "job_3883c574f4e94a8783bab582a8c633a9",
+  "type": "EPUB_IMPORT",
+  "status": "COMPLETED",
+  "progress": 100,
+  "currentStep": 3,
+  "totalSteps": 10,
+  "message": "Job completed successfully",
+  "metadataJson": "{\"source\":\"manual-test\"}",
+  "createdAt": "2026-05-15T18:16:34.603573",
+  "startedAt": "2026-05-15T18:16:38.868631",
+  "finishedAt": "2026-05-15T18:18:24.5482539",
+  "updatedAt": "2026-05-15T18:18:24.5482539",
+  "errorCode": null,
+  "errorMessage": null
+}
+```
+### Fail Job
+```
+curl --request POST \
+  --url http://localhost:8088/api/jobs/job_5b8dfaddb45c437e9e36eedcceb66093/fail \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "errorCode": "EPUB_PARSE_ERROR",
+  "errorMessage": "Unable to read EPUB spine"
+}'
+```
+Resposta esperada
+```json
+{
+  "id": "job_5b8dfaddb45c437e9e36eedcceb66093",
+  "type": "EPUB_IMPORT",
+  "status": "FAILED",
+  "progress": 0,
+  "currentStep": 0,
+  "totalSteps": 10,
+  "message": "Starting EPUB import",
+  "metadataJson": "{\"source\":\"manual-test\"}",
+  "createdAt": "2026-05-15T18:19:20.137946",
+  "startedAt": "2026-05-15T18:19:23.293639",
+  "finishedAt": "2026-05-15T18:19:26.8488543",
+  "updatedAt": "2026-05-15T18:19:26.8488543",
+  "errorCode": "EPUB_PARSE_ERROR",
+  "errorMessage": "Unable to read EPUB spine"
+}
+```
+### Cancel Job
+```
+curl --request POST \
+  --url http://localhost:8088/api/jobs/job_621a322fca174f9796e7fa5698b65c9e/cancel \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "message": "Cancelled by user"
+}'
+```
+Resposta esperada
+```json
+{
+  "id": "job_621a322fca174f9796e7fa5698b65c9e",
+  "type": "EPUB_IMPORT",
+  "status": "CANCELLED",
+  "progress": 0,
+  "currentStep": 0,
+  "totalSteps": 10,
+  "message": "Cancelled by user",
+  "metadataJson": "{\"source\":\"manual-test\"}",
+  "createdAt": "2026-05-15T18:20:39.365874",
+  "startedAt": "2026-05-15T18:20:43.354565",
+  "finishedAt": "2026-05-15T18:20:46.6276384",
+  "updatedAt": "2026-05-15T18:20:46.6276384",
+  "errorCode": null,
+  "errorMessage": null
+}
+```
 ## Banco de dados local
 
 O projeto usa PostgreSQL.

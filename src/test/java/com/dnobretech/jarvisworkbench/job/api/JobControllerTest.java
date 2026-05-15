@@ -3,9 +3,7 @@ package com.dnobretech.jarvisworkbench.job.api;
 import com.dnobretech.jarvisworkbench.job.application.JobService;
 import com.dnobretech.jarvisworkbench.job.domain.JobStatus;
 import com.dnobretech.jarvisworkbench.job.domain.JobType;
-import com.dnobretech.jarvisworkbench.job.dto.CreateJobRequest;
-import com.dnobretech.jarvisworkbench.job.dto.JobListResponse;
-import com.dnobretech.jarvisworkbench.job.dto.JobResponse;
+import com.dnobretech.jarvisworkbench.job.dto.*;
 import com.dnobretech.jarvisworkbench.shared.error.BusinessException;
 import com.dnobretech.jarvisworkbench.shared.error.GlobalExceptionHandler;
 import com.dnobretech.jarvisworkbench.shared.error.ResourceNotFoundException;
@@ -25,6 +23,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -110,6 +109,199 @@ class JobControllerTest {
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.error").value("BUSINESS_ERROR"))
                 .andExpect(jsonPath("$.message").value("Page size must be less than or equal to 100"));
+    }
+
+    @Test
+    void shouldStartJob() throws Exception {
+        StartJobRequest request = new StartJobRequest(10, "Starting EPUB import");
+        JobResponse response = criarJobResponseMock("job_123", JobType.EPUB_IMPORT, JobStatus.RUNNING);
+
+        Mockito.when(jobService.startJob(any(String.class), any(StartJobRequest.class)))
+                .thenReturn(response);
+
+        mockMvc.perform(post("/api/jobs/job_123/start")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("job_123"))
+                .andExpect(jsonPath("$.type").value("EPUB_IMPORT"))
+                .andExpect(jsonPath("$.status").value("RUNNING"));
+    }
+
+    @Test
+    void shouldUpdateJobProgress() throws Exception {
+        UpdateJobProgressRequest request = new UpdateJobProgressRequest(
+                35,
+                3,
+                10,
+                "Extracting chapters"
+        );
+
+        JobResponse response = new JobResponse(
+                "job_123",
+                JobType.EPUB_IMPORT,
+                JobStatus.RUNNING,
+                35,
+                3,
+                10,
+                "Extracting chapters",
+                "{}",
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                null,
+                LocalDateTime.now(),
+                null,
+                null
+        );
+
+        Mockito.when(jobService.updateProgress(any(String.class), any(UpdateJobProgressRequest.class)))
+                .thenReturn(response);
+
+        mockMvc.perform(patch("/api/jobs/job_123/progress")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("job_123"))
+                .andExpect(jsonPath("$.status").value("RUNNING"))
+                .andExpect(jsonPath("$.progress").value(35))
+                .andExpect(jsonPath("$.currentStep").value(3))
+                .andExpect(jsonPath("$.totalSteps").value(10))
+                .andExpect(jsonPath("$.message").value("Extracting chapters"));
+    }
+
+    @Test
+    void shouldCompleteJob() throws Exception {
+        CompleteJobRequest request = new CompleteJobRequest("Job completed successfully");
+
+        JobResponse response = new JobResponse(
+                "job_123",
+                JobType.EPUB_IMPORT,
+                JobStatus.COMPLETED,
+                100,
+                10,
+                10,
+                "Job completed successfully",
+                "{}",
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                null,
+                null
+        );
+
+        Mockito.when(jobService.completeJob(any(String.class), any(CompleteJobRequest.class)))
+                .thenReturn(response);
+
+        mockMvc.perform(post("/api/jobs/job_123/complete")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("COMPLETED"))
+                .andExpect(jsonPath("$.progress").value(100))
+                .andExpect(jsonPath("$.message").value("Job completed successfully"));
+    }
+
+    @Test
+    void shouldFailJob() throws Exception {
+        FailJobRequest request = new FailJobRequest(
+                "EPUB_PARSE_ERROR",
+                "Unable to read EPUB spine"
+        );
+
+        JobResponse response = new JobResponse(
+                "job_123",
+                JobType.EPUB_IMPORT,
+                JobStatus.FAILED,
+                0,
+                0,
+                10,
+                "",
+                "{}",
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                "EPUB_PARSE_ERROR",
+                "Unable to read EPUB spine"
+        );
+
+        Mockito.when(jobService.failJob(any(String.class), any(FailJobRequest.class)))
+                .thenReturn(response);
+
+        mockMvc.perform(post("/api/jobs/job_123/fail")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andExpect(jsonPath("$.errorCode").value("EPUB_PARSE_ERROR"))
+                .andExpect(jsonPath("$.errorMessage").value("Unable to read EPUB spine"));
+    }
+
+    @Test
+    void shouldCancelJob() throws Exception {
+        CancelJobRequest request = new CancelJobRequest(
+                "Cancelled by user"
+        );
+
+        JobResponse response = new JobResponse(
+                "job_123",
+                JobType.EPUB_IMPORT,
+                JobStatus.CANCELLED,
+                100,
+                0,
+                0,
+                "Cancelled by user",
+                "{}",
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                null,
+                null
+        );
+
+        Mockito.when(jobService.cancelJob(any(String.class), any(CancelJobRequest.class)))
+                .thenReturn(response);
+
+        mockMvc.perform(post("/api/jobs/job_123/cancel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CANCELLED"))
+                .andExpect(jsonPath("$.message").value("Cancelled by user"));
+    }
+
+    @Test
+    void shouldRejectInvalidProgress() throws Exception {
+        UpdateJobProgressRequest request = new UpdateJobProgressRequest(
+                101,
+                3,
+                10,
+                "Invalid progress"
+        );
+
+        mockMvc.perform(patch("/api/jobs/job_123/progress")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.fields[0].name").value("progress"));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenStartingMissingJob() throws Exception {
+        StartJobRequest request = new StartJobRequest(10, "Starting EPUB import");
+
+        Mockito.when(jobService.startJob(any(String.class), any(StartJobRequest.class)))
+                .thenThrow(new ResourceNotFoundException("Job execution not found"));
+
+        mockMvc.perform(post("/api/jobs/job_999/start")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("RESOURCE_NOT_FOUND"))
+                .andExpect(jsonPath("$.message").value("Job execution not found"));
     }
 
     private JobResponse criarJobResponseMock(String publicID, JobType jobType, JobStatus jobStatus) {

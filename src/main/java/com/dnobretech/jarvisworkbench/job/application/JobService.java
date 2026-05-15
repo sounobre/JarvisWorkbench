@@ -3,13 +3,11 @@ package com.dnobretech.jarvisworkbench.job.application;
 import com.dnobretech.jarvisworkbench.job.domain.JobExecution;
 import com.dnobretech.jarvisworkbench.job.domain.JobStatus;
 import com.dnobretech.jarvisworkbench.job.domain.JobType;
-import com.dnobretech.jarvisworkbench.job.dto.CreateJobRequest;
-import com.dnobretech.jarvisworkbench.job.dto.JobListResponse;
-import com.dnobretech.jarvisworkbench.job.dto.JobResponse;
+import com.dnobretech.jarvisworkbench.job.dto.*;
 import com.dnobretech.jarvisworkbench.job.repository.JobExecutionRepository;
 import com.dnobretech.jarvisworkbench.shared.error.BusinessException;
 import com.dnobretech.jarvisworkbench.shared.error.ResourceNotFoundException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,19 +34,27 @@ public class JobService {
         return jobMapper.toResponse(jobExecutionRepository.save(jobExecution));
     }
 
-    @Transactional
-    public JobResponse findByPublicId(String publicId){
-        Optional<JobExecution> jobExecution = jobExecutionRepository.findByPublicId(publicId);
-        return jobExecution.map(jobMapper::toResponse).orElseThrow(() -> new ResourceNotFoundException("Job execution not found"));
+    @Transactional(readOnly = true)
+    public JobResponse findByPublicId(String publicId) {
+        JobExecution jobExecution = findByPublicIdOrThrow(publicId);
+        return jobMapper.toResponse(jobExecution);
     }
 
-    @Transactional
+    private JobExecution findByPublicIdOrThrow(String publicId) {
+        Optional<JobExecution> jobExecution = jobExecutionRepository.findByPublicId(publicId);
+        if (jobExecution.isPresent()) {
+            return jobExecution.get();
+        }
+        throw new ResourceNotFoundException("Job execution not found");
+    }
+
+    @Transactional(readOnly = true)
     public JobListResponse listJobs(
             JobStatus status,
             JobType type,
             int page,
             int size
-    ){
+    ) {
 
         validatePagination(page, size);
 
@@ -80,6 +86,46 @@ public class JobService {
         if (size > 100) {
             throw new BusinessException("Page size must be less than or equal to 100");
         }
+    }
+
+    @Transactional
+    public JobResponse startJob(String publicId, StartJobRequest request) {
+
+        JobExecution jobExecution = findByPublicIdOrThrow(publicId);
+        jobExecution.start(request.totalSteps(), request.message());
+        jobExecutionRepository.save(jobExecution);
+        return jobMapper.toResponse(jobExecution);
+    }
+
+    @Transactional
+    public JobResponse updateProgress(String publicId, UpdateJobProgressRequest request) {
+        JobExecution jobExecution = findByPublicIdOrThrow(publicId);
+        jobExecution.updateProgress(request.progress(), request.currentStep(), request.totalSteps(), request.message());
+        jobExecutionRepository.save(jobExecution);
+        return jobMapper.toResponse(jobExecution);
+    }
+
+    @Transactional
+    public JobResponse completeJob(String publicId, CompleteJobRequest request) {
+        JobExecution jobExecution = findByPublicIdOrThrow(publicId);
+        jobExecution.complete(request.message());
+        jobExecutionRepository.save(jobExecution);
+        return jobMapper.toResponse(jobExecution);
+    }
+
+    @Transactional
+    public JobResponse failJob(String publicId, FailJobRequest request) {
+        JobExecution jobExecution = findByPublicIdOrThrow(publicId);
+        jobExecution.fail(request.errorCode(), request.errorMessage());
+        jobExecutionRepository.save(jobExecution);
+        return jobMapper.toResponse(jobExecution);
+    }
+    @Transactional
+    public JobResponse cancelJob(String publicId, CancelJobRequest request) {
+        JobExecution jobExecution = findByPublicIdOrThrow(publicId);
+        jobExecution.cancel(request.message());
+        jobExecutionRepository.save(jobExecution);
+        return jobMapper.toResponse(jobExecution);
     }
 
 }
