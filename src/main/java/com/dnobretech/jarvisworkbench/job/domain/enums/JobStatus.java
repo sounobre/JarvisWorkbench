@@ -1,4 +1,4 @@
-package com.dnobretech.jarvisworkbench.job.domain;
+package com.dnobretech.jarvisworkbench.job.domain.enums;
 
 public enum JobStatus {
     PENDING,

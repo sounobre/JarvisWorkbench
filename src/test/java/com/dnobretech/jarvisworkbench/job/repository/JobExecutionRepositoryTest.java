@@ -1,8 +1,8 @@
 package com.dnobretech.jarvisworkbench.job.repository;
 
 import com.dnobretech.jarvisworkbench.job.domain.JobExecution;
-import com.dnobretech.jarvisworkbench.job.domain.JobStatus;
-import com.dnobretech.jarvisworkbench.job.domain.JobType;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobStatus;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

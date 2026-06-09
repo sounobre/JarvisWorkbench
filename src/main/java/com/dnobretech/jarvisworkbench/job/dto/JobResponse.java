@@ -1,7 +1,7 @@
 package com.dnobretech.jarvisworkbench.job.dto;
 
-import com.dnobretech.jarvisworkbench.job.domain.JobStatus;
-import com.dnobretech.jarvisworkbench.job.domain.JobType;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobStatus;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobType;
 
 import java.time.LocalDateTime;
 

@@ -1,12 +1,16 @@
 package com.dnobretech.jarvisworkbench.job.application;
 
+import com.dnobretech.jarvisworkbench.job.application.mapper.JobMapper;
 import com.dnobretech.jarvisworkbench.job.domain.JobExecution;
-import com.dnobretech.jarvisworkbench.job.domain.JobStatus;
-import com.dnobretech.jarvisworkbench.job.domain.JobType;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobEventLevel;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobStatus;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobType;
 import com.dnobretech.jarvisworkbench.job.dto.*;
 import com.dnobretech.jarvisworkbench.job.repository.JobExecutionRepository;
 import com.dnobretech.jarvisworkbench.shared.error.BusinessException;
 import com.dnobretech.jarvisworkbench.shared.error.ResourceNotFoundException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,13 +31,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
-public class JobServiceTest {
+class JobServiceTest {
 
     @Mock
     private JobExecutionRepository jobExecutionRepository;
 
     @Mock
     private JobMapper jobMapper;
+
+    @Mock
+    private JobEventService jobEventService;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @InjectMocks
     private JobService jobService;
@@ -49,7 +59,7 @@ public class JobServiceTest {
     }
 
     @Test
-    void shouldCreateJob(){
+    void shouldCreateJob()  {
         CreateJobRequest createJobRequest = new CreateJobRequest(JobType.EPUB_IMPORT, "{}");
 
         Mockito.when(jobExecutionRepository.save(any(JobExecution.class))).thenReturn(jobExecutionMock);
@@ -59,6 +69,13 @@ public class JobServiceTest {
 
         assertThat(jobResponse).isNotNull();
         assertThat(jobResponse.type()).isEqualTo(JobType.EPUB_IMPORT);
+
+        Mockito.verify(jobEventService).registerEvent(
+                any(JobExecution.class),
+                eq(JobEventLevel.INFO),
+                eq("Job created"),
+                eq(null)
+        );
 
         Mockito.verify(jobExecutionRepository, Mockito.times(1)).save(any(JobExecution.class));
     }
@@ -214,7 +231,7 @@ public class JobServiceTest {
     }
 
     @Test
-    void shouldStartJob() {
+    void shouldStartJob()  {
         JobExecution jobExecution = JobExecution.create(JobType.EPUB_IMPORT, "{}");
         String publicId = jobExecution.getPublicId();
 
@@ -236,13 +253,20 @@ public class JobServiceTest {
         assertThat(response.message()).isEqualTo("Starting EPUB import");
         assertThat(response.startedAt()).isNotNull();
 
+        Mockito.verify(jobEventService).registerEvent(
+                eq(jobExecution),
+                eq(JobEventLevel.INFO),
+                eq("Job started"),
+                eq(null)
+        );
+
         Mockito.verify(jobExecutionRepository).findByPublicId(publicId);
         Mockito.verify(jobExecutionRepository).save(jobExecution);
         Mockito.verify(jobMapper).toResponse(jobExecution);
     }
 
     @Test
-    void shouldUpdateProgress() {
+    void shouldUpdateProgress() throws JsonProcessingException {
         JobExecution jobExecution = JobExecution.create(JobType.EPUB_IMPORT, "{}");
         jobExecution.start(10, "Starting");
 
@@ -258,6 +282,9 @@ public class JobServiceTest {
         Mockito.when(jobExecutionRepository.findByPublicId(publicId))
                 .thenReturn(Optional.of(jobExecution));
 
+        Mockito.when(objectMapper.writeValueAsString(any()))
+                .thenReturn("{\"progress\":35,\"currentStep\":3,\"totalSteps\":10}");
+
         mockMapperToResponseFromEntity();
 
         JobResponse response = jobService.updateProgress(publicId, request);
@@ -268,12 +295,19 @@ public class JobServiceTest {
         assertThat(response.totalSteps()).isEqualTo(10);
         assertThat(response.message()).isEqualTo("Extracting chapters");
 
+        Mockito.verify(jobEventService).registerEvent(
+                eq(jobExecution),
+                eq(JobEventLevel.INFO),
+                eq("Job progress updated"),
+                any(String.class)
+        );
+
         Mockito.verify(jobExecutionRepository).save(jobExecution);
         Mockito.verify(jobMapper).toResponse(jobExecution);
     }
 
     @Test
-    void shouldCompleteJob() {
+    void shouldCompleteJob()  {
         JobExecution jobExecution = JobExecution.create(JobType.EPUB_IMPORT, "{}");
         jobExecution.start(10, "Starting");
 
@@ -292,6 +326,13 @@ public class JobServiceTest {
         assertThat(response.progress()).isEqualTo(100);
         assertThat(response.finishedAt()).isNotNull();
         assertThat(response.message()).isEqualTo("Job completed successfully");
+
+        Mockito.verify(jobEventService).registerEvent(
+                eq(jobExecution),
+                eq(JobEventLevel.INFO),
+                eq("Job completed"),
+                eq(null)
+        );
 
         Mockito.verify(jobExecutionRepository).save(jobExecution);
         Mockito.verify(jobMapper).toResponse(jobExecution);
@@ -318,12 +359,19 @@ public class JobServiceTest {
         assertThat(response.errorCode()).isEqualTo("EPUB_PARSE_ERROR");
         assertThat(response.errorMessage()).isEqualTo("Unable to read EPUB spine");
 
+        Mockito.verify(jobEventService).registerEvent(
+                jobExecution,
+                JobEventLevel.ERROR,
+                "Job failed",
+                null
+        );
+
         Mockito.verify(jobExecutionRepository).save(jobExecution);
         Mockito.verify(jobMapper).toResponse(jobExecution);
     }
 
     @Test
-    void shouldCancelJob() {
+    void shouldCancelJob()  {
         JobExecution jobExecution = JobExecution.create(JobType.EPUB_IMPORT, "{}");
         jobExecution.start(10, "Starting");
 
@@ -341,6 +389,13 @@ public class JobServiceTest {
         assertThat(response.status()).isEqualTo(JobStatus.CANCELLED);
         assertThat(response.finishedAt()).isNotNull();
         assertThat(response.message()).isEqualTo("Cancelled by user");
+
+        Mockito.verify(jobEventService).registerEvent(
+                eq(jobExecution),
+                eq(JobEventLevel.WARN),
+                eq("Job cancelled"),
+                eq(null)
+        );
 
         Mockito.verify(jobExecutionRepository).save(jobExecution);
         Mockito.verify(jobMapper).toResponse(jobExecution);

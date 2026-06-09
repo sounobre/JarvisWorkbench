@@ -1,5 +1,7 @@
 package com.dnobretech.jarvisworkbench.job.domain;
 
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobStatus;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobType;
 import com.dnobretech.jarvisworkbench.shared.error.BusinessException;
 import jakarta.persistence.*;
 

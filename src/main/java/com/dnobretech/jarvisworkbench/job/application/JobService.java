@@ -1,18 +1,22 @@
 package com.dnobretech.jarvisworkbench.job.application;
 
+import com.dnobretech.jarvisworkbench.job.application.mapper.JobMapper;
 import com.dnobretech.jarvisworkbench.job.domain.JobExecution;
-import com.dnobretech.jarvisworkbench.job.domain.JobStatus;
-import com.dnobretech.jarvisworkbench.job.domain.JobType;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobEventLevel;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobStatus;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobType;
 import com.dnobretech.jarvisworkbench.job.dto.*;
 import com.dnobretech.jarvisworkbench.job.repository.JobExecutionRepository;
 import com.dnobretech.jarvisworkbench.shared.error.BusinessException;
 import com.dnobretech.jarvisworkbench.shared.error.ResourceNotFoundException;
-import org.springframework.transaction.annotation.Transactional;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -21,17 +25,25 @@ public class JobService {
 
     private final JobExecutionRepository jobExecutionRepository;
     private final JobMapper jobMapper;
+    private final JobEventService jobEventService;
+    private final ObjectMapper objectMapper;
 
 
-    public JobService(JobExecutionRepository jobExecutionRepository, JobMapper jobMapper) {
+    public JobService(JobExecutionRepository jobExecutionRepository, JobMapper jobMapper, JobEventService jobEventService, ObjectMapper objectMapper) {
         this.jobExecutionRepository = jobExecutionRepository;
         this.jobMapper = jobMapper;
+        this.jobEventService = jobEventService;
+        this.objectMapper = objectMapper;
     }
 
     @Transactional
     public JobResponse createJob(CreateJobRequest createJobRequest) {
         JobExecution jobExecution = JobExecution.create(createJobRequest.type(), createJobRequest.metadataJson());
-        return jobMapper.toResponse(jobExecutionRepository.save(jobExecution));
+        JobResponse response = jobMapper.toResponse(jobExecutionRepository.save(jobExecution));
+
+        jobEventService.registerEvent(jobExecution, JobEventLevel.INFO, "Job created", null);
+
+        return response;
     }
 
     @Transactional(readOnly = true)
@@ -94,6 +106,9 @@ public class JobService {
         JobExecution jobExecution = findByPublicIdOrThrow(publicId);
         jobExecution.start(request.totalSteps(), request.message());
         jobExecutionRepository.save(jobExecution);
+
+        jobEventService.registerEvent(jobExecution, JobEventLevel.INFO, "Job started", null);
+
         return jobMapper.toResponse(jobExecution);
     }
 
@@ -102,7 +117,21 @@ public class JobService {
         JobExecution jobExecution = findByPublicIdOrThrow(publicId);
         jobExecution.updateProgress(request.progress(), request.currentStep(), request.totalSteps(), request.message());
         jobExecutionRepository.save(jobExecution);
+
+        jobEventService.registerEvent(jobExecution, JobEventLevel.INFO, "Job progress updated", jobProgressDetail(jobExecution));
+
         return jobMapper.toResponse(jobExecution);
+    }
+
+    private String jobProgressDetail(JobExecution j) {
+        JobProgressDetails jobProgressDetails = new JobProgressDetails(j.getProgress(), j.getCurrentStep(), j.getTotalSteps());
+
+        try {
+            return objectMapper.writeValueAsString(jobProgressDetails);
+        } catch (JsonProcessingException ex) {
+            throw new BusinessException("Unable to serialize job event details");
+        }
+
     }
 
     @Transactional
@@ -110,6 +139,9 @@ public class JobService {
         JobExecution jobExecution = findByPublicIdOrThrow(publicId);
         jobExecution.complete(request.message());
         jobExecutionRepository.save(jobExecution);
+
+        jobEventService.registerEvent(jobExecution, JobEventLevel.INFO, "Job completed", null);
+
         return jobMapper.toResponse(jobExecution);
     }
 
@@ -118,13 +150,31 @@ public class JobService {
         JobExecution jobExecution = findByPublicIdOrThrow(publicId);
         jobExecution.fail(request.errorCode(), request.errorMessage());
         jobExecutionRepository.save(jobExecution);
+
+        jobEventService.registerEvent(jobExecution, JobEventLevel.ERROR, "Job failed", failJobDetail(jobExecution));
+
         return jobMapper.toResponse(jobExecution);
     }
+
+    private String failJobDetail(JobExecution j) {
+        FailJobRequest failJobRequest = new FailJobRequest(j.getErrorCode(), j.getErrorMessage());
+
+        try {
+            return objectMapper.writeValueAsString(failJobRequest);
+        } catch (JsonProcessingException ex) {
+            throw new BusinessException("Unable to serialize job event details");
+        }
+
+    }
+
     @Transactional
     public JobResponse cancelJob(String publicId, CancelJobRequest request) {
         JobExecution jobExecution = findByPublicIdOrThrow(publicId);
         jobExecution.cancel(request.message());
         jobExecutionRepository.save(jobExecution);
+
+        jobEventService.registerEvent(jobExecution, JobEventLevel.WARN, "Job cancelled", null);
+
         return jobMapper.toResponse(jobExecution);
     }
 

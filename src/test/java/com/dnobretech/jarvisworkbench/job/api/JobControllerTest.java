@@ -1,8 +1,8 @@
 package com.dnobretech.jarvisworkbench.job.api;
 
 import com.dnobretech.jarvisworkbench.job.application.JobService;
-import com.dnobretech.jarvisworkbench.job.domain.JobStatus;
-import com.dnobretech.jarvisworkbench.job.domain.JobType;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobStatus;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobType;
 import com.dnobretech.jarvisworkbench.job.dto.*;
 import com.dnobretech.jarvisworkbench.shared.error.BusinessException;
 import com.dnobretech.jarvisworkbench.shared.error.GlobalExceptionHandler;
