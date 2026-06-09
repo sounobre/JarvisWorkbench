@@ -1,9 +1,10 @@
 package com.dnobretech.jarvisworkbench.job.api;
 
 import com.dnobretech.jarvisworkbench.job.application.JobService;
-import com.dnobretech.jarvisworkbench.job.domain.JobStatus;
-import com.dnobretech.jarvisworkbench.job.domain.JobType;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobStatus;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobType;
 import com.dnobretech.jarvisworkbench.job.dto.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class JobController {
     }
 
     @PostMapping
-    public ResponseEntity<JobResponse> createJob(@Valid @RequestBody CreateJobRequest createJobRequest) {
+    public ResponseEntity<JobResponse> createJob(@Valid @RequestBody CreateJobRequest createJobRequest)  {
 
         JobResponse jobResponse = jobService.createJob(createJobRequest);
 
@@ -44,7 +45,7 @@ public class JobController {
     }
 
     @PostMapping("/{publicId}/start")
-    public ResponseEntity<JobResponse> startJob(@PathVariable String publicId, @Valid @RequestBody StartJobRequest startJobRequest) {
+    public ResponseEntity<JobResponse> startJob(@PathVariable String publicId, @Valid @RequestBody StartJobRequest startJobRequest)  {
 
         JobResponse jobResponse = jobService.startJob(publicId, startJobRequest);
 
@@ -59,7 +60,7 @@ public class JobController {
     }
 
     @PostMapping("/{publicId}/complete")
-    public ResponseEntity<JobResponse> completeJob(@PathVariable String publicId, @RequestBody CompleteJobRequest completeJobRequest) {
+    public ResponseEntity<JobResponse> completeJob(@PathVariable String publicId, @RequestBody CompleteJobRequest completeJobRequest)  {
         JobResponse jobResponse = jobService.completeJob(publicId, completeJobRequest);
         return ResponseEntity.ok().body(jobResponse);
     }
@@ -71,7 +72,7 @@ public class JobController {
     }
 
     @PostMapping("/{publicId}/cancel")
-    public ResponseEntity<JobResponse> cancelJob(@PathVariable String publicId, @RequestBody CancelJobRequest cancelJobRequest) {
+    public ResponseEntity<JobResponse> cancelJob(@PathVariable String publicId, @RequestBody CancelJobRequest cancelJobRequest)  {
         JobResponse jobResponse = jobService.cancelJob(publicId, cancelJobRequest);
         return ResponseEntity.ok().body(jobResponse);
     }

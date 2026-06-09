@@ -456,7 +456,7 @@ Como sistema, quero iniciar, atualizar progresso, concluir e falhar jobs com reg
 ---
 
 ## JW-013 — Log de eventos do job
-
+JW-013 — DONE
 ### Estória
 
 Como usuário, quero ver eventos de um job para entender onde a importação ou alinhamento falhou.

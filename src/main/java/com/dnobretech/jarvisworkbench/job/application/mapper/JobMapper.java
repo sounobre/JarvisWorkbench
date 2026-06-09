@@ -1,4 +1,4 @@
-package com.dnobretech.jarvisworkbench.job.application;
+package com.dnobretech.jarvisworkbench.job.application.mapper;
 
 import com.dnobretech.jarvisworkbench.job.domain.JobExecution;
 import com.dnobretech.jarvisworkbench.job.dto.JobListResponse;

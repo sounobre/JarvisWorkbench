@@ -1,6 +1,6 @@
 package com.dnobretech.jarvisworkbench.job.dto;
 
-import com.dnobretech.jarvisworkbench.job.domain.JobType;
+import com.dnobretech.jarvisworkbench.job.domain.enums.JobType;
 import jakarta.validation.constraints.NotNull;
 
 public record CreateJobRequest(
